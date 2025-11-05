@@ -1,7 +1,7 @@
 <!-- Compiles directly to <x-cpp-callout> -->
 <svelte:options
   customElement={{
-    tag: 'x-cpp-callout',
+    tag: 'csis-cpp-callout',
     props: {
       href:       { type: 'String', reflect: true },             // used by image link (and default text link)
       imageSrc:   { attribute: 'image-src', type: 'String' },    // image URL

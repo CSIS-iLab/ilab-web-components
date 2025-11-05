@@ -1,6 +1,6 @@
 <svelte:options
   customElement={{
-    tag: "x-audio-brief",
+    tag: "csis-audio-brief",
     props: {
       /* content and sources */
       title: { reflect: true, type: "String" },

@@ -1,7 +1,7 @@
 <!-- src/Callout.svelte -->
 <svelte:options
   customElement={{
-    tag: 'x-callout',
+    tag: 'csis-callout',
     props: {
       heading:  { reflect: true, type: 'String' },
       imageSrc: { attribute: 'image-src', type: 'String' },
