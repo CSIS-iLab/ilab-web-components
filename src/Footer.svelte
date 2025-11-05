@@ -359,11 +359,9 @@
 
     <div class="footer__copyright">
       <p>
-        <span
-          >Copyright &copy;
-          <script>
-            document.write(new Date().getFullYear());
-          </script> Center for Strategic & International Studies. All rights reserved.
+        <span>
+          Copyright &copy; {new Date().getFullYear()}
+          Center for Strategic & International Studies…
         </span>
         <a href="https://www.csis.org/privacy-policy" class="privacy-policy">
           Privacy Policy</a
