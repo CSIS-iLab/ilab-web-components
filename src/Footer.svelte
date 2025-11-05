@@ -533,7 +533,12 @@
 
     .footer__col.footer__address {
       margin-top: 1rem;
-      margin-bottom: 2rem;
+      margin-bottom: 0;
+      margin-left: 0;
+    }
+
+    .footer__social {
+      margin-top: 0;
     }
   }
 </style>
