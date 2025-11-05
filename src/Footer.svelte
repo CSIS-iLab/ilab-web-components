@@ -9,12 +9,12 @@
 />
 
 <script>
-  let { textColor = "#fff", backgroundColor = "#0000aF" } = $props();
+  let { textColor = "#fff", backgroundColor = "#4b4b4b" } = $props();
 </script>
 
 <footer
   class="footer"
-  style={`--footer-bg: ${backgroundColor}; --footer-fg: ${textColor};`}
+  style={`--footer-bg: ${backgroundColor}; --footer-text: ${textColor};`}
 >
   <div class="container">
     <div class="footer__main">
@@ -360,8 +360,8 @@
     <div class="footer__copyright">
       <p>
         <span>
-          Copyright &copy; { new Date().getFullYear() }
-          Center for Strategic & International Studies…
+          Copyright &copy; {new Date().getFullYear()}
+          Center for Strategic & International Studies. All rights reserved.
         </span>
         <a href="https://www.csis.org/privacy-policy" class="privacy-policy">
           Privacy Policy</a
@@ -376,12 +376,12 @@
 
   :host {
     --footer-bg: #4b4b4b;
-    --footer-fg: #fff;
+    --footer-text: #fff;
   }
 
   .footer {
     background: var(--footer-bg);
-    color: var(--footer-fg);
+    color: var(--footer-text);
     padding-top: 1.25rem;
     padding-bottom: 2rem;
     width: 100%;
@@ -407,6 +407,11 @@
     align-items: center;
   }
 
+  .footer__brand path {
+    fill: var(--footer-text);
+    transition: fill 0.3s ease;
+  }
+
   .footer__col {
     display: flex;
     flex-direction: column;
@@ -426,7 +431,6 @@
   /* make the icons inherit the link color */
   .footer__social a svg path {
     fill: currentColor !important;
-    /* override inline fill=... */
     transition:
       fill 0.3s ease,
       opacity 0.3s ease;
@@ -434,15 +438,17 @@
 
   /* animate the color on the link itself */
   .footer__social a {
-    color: rgba(255, 255, 255, 0.8);
-    /* default */
+    color: var(--footer-text);
+    opacity: 0.8;
     transition:
       color 0.3s ease,
+      opacity 0.3s ease,
       transform 0.3s ease;
   }
 
   .footer__social a:hover {
-    color: #fff;
+    color: var(--footer-text);
+    opacity: 1;
     transform: translateY(-1px);
   }
 
@@ -458,12 +464,13 @@
   }
 
   .footer__copyright a {
-    color: #fff;
+    color: var(--footer-text);
+    opacity: 0.8;
     transition: all 0.3s ease-in-out;
   }
 
   .footer__copyright a:hover {
-    opacity: 0.8;
+    opacity: 1;
   }
 
   /*-- ------------------- Footer Text ------------------- --*/
@@ -484,7 +491,8 @@
 
   .footer__col.footer__address p {
     margin: 0;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--footer-text);
+    opacity: 0.8;
   }
 
   /*-- --------------------------------------------------- --*/
