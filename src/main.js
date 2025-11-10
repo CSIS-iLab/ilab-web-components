@@ -3,3 +3,4 @@ import './CppCallout.svelte';
 import './Callout.svelte';
 import './AudioBrief.svelte';
 import './Footer.svelte';
+import './BootcampPlayer.svelte';
