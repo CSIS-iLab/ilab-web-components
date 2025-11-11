@@ -4,3 +4,4 @@ import './Callout.svelte';
 import './AudioBrief.svelte';
 import './Footer.svelte';
 import './BootcampPlayer.svelte';
+import './AudioHighlight.svelte';
