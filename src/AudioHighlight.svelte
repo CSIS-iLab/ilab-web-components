@@ -19,15 +19,17 @@
   } = $props();
 
   let isPlaying = $state(false);
-
-  // shadow-DOM-safe refs
-  let highlight;
-  let playIcon;
-  let pauseIcon;
   let myAudio;
 
   function play() {
-    isPlaying ? pauseAudio() : playAudio();
+    if (!myAudio) return;
+    if (isPlaying) {
+      myAudio.pause();
+      isPlaying = false; // <- pauses, but does not remove .animate
+    } else {
+      myAudio.play();
+      isPlaying = true; // <- resumes from current position
+    }
   }
 
   function pauseAudio() {
@@ -54,7 +56,7 @@
   </p>
   <span
     id="highlight"
-    class="highlight-span"
+    class="highlight-span animate"
     class:animate={isPlaying}
     bind:this={highlight}
     onanimationend={onAnimationEnd}
@@ -101,7 +103,7 @@
 </div>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+  @import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap");
 
   #container {
     padding-top: 20px;
