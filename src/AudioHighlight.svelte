@@ -19,31 +19,54 @@
   } = $props();
 
   let isPlaying = $state(false);
+  let hasAnimated = $state(false); // controls .animate
+
+  let highlight;
+  let playIcon;
+  let pauseIcon;
   let myAudio;
 
-  function play() {
-    if (!myAudio) return;
-    if (isPlaying) {
-      myAudio.pause();
-      isPlaying = false; // <- pauses, but does not remove .animate
-    } else {
-      myAudio.play();
-      isPlaying = true; // <- resumes from current position
-    }
-  }
-
   function pauseAudio() {
-    myAudio?.pause();
+    myAudio.pause();
+    playIcon.classList.remove("hide");
+    pauseIcon.classList.add("hide");
+    
+    if (highlight) {
+      highlight.style.animationPlayState = "paused";
+    }
+
     isPlaying = false;
   }
 
   function playAudio() {
-    myAudio?.play();
+    myAudio.play();
+    hasAnimated = true;
+    if (highlight) {
+      highlight.style.animationPlayState = "running";
+    }
+    playIcon.classList.add("hide");
+    pauseIcon.classList.remove("hide");
     isPlaying = true;
   }
 
-  function onAnimationEnd() {
-    // end of sweep → show play button again
+  function play() {
+    isPlaying ? pauseAudio() : playAudio();
+
+    console.log("click");
+  }
+
+  function handleAnimationEnd() {
+    console.log("end");
+
+    if (highlight) {
+      highlight.style.animationPlayState = "paused";
+    }
+
+    // remove the .animate class so we go back to “solid” background
+    hasAnimated = false;
+
+    pauseIcon.classList.add("hide");
+    playIcon.classList.remove("hide");
     isPlaying = false;
   }
 </script>
@@ -56,17 +79,19 @@
   </p>
   <span
     id="highlight"
-    class="highlight-span animate"
-    class:animate={isPlaying}
     bind:this={highlight}
-    onanimationend={onAnimationEnd}
+    class="highlight-span"
+    class:animate={hasAnimated}
+    onanimationend={handleAnimationEnd}
     style={`--highlight-color:${highlightColor}; --highlight-background:${highlightBg}; --play:${playColor};`}
   >
     <audio id="myAudio" bind:this={myAudio} src={audioSrc}></audio>
 
-    <button onclick={play}>
-      <span class="visually-hidden">{isPlaying ? "Pause" : "Play"}</span>
+    <button type="button" onclick={play}>
+      <span class="visually-hidden">Play</span>
       <svg
+        aria-hidden="true"
+        focusable="false"
         id="playIcon"
         bind:this={playIcon}
         xmlns="http://www.w3.org/2000/svg"
@@ -96,9 +121,8 @@
         />
       </svg>
     </button>
-
-    “told us we must solve our own problems. Instead of going to court, instead
-    of using judiciaries, … he said we must solve our own problems internally.”
+    “told us we must solve our own problems. Instead of going to court, instead of
+    using judiciaries, … he said we must solve our own problems internally.”
   </span>
 </div>
 
@@ -111,23 +135,23 @@
     margin: auto;
   }
 
+  #myAudio {
+    display: none;
+  }
+
   #audioParagraph,
   #highlight {
     font-family: "Source Serif 4", serif;
-    font-size: 1.375rem;
-    line-height: 1.3;
+    font-size: 1.125rem;
+    line-height: 1.5;
   }
 
   #audioParagraph {
-    color: #080808;
+    color: #080808; /* main text color */
   }
 
   #highlight {
-    color: var(--highlight-color);
-  }
-
-  #myAudio {
-    display: none;
+    color: var(--highlight-color); /* text being highlighted */
   }
 
   #playIcon,
@@ -137,8 +161,10 @@
   }
 
   .highlight-span {
-    padding: 0 4px;
-    background: var(--highlight-background);
+    padding: 0 2px;
+    background: var(
+      --highlight-background
+    ); /*highlight color before pushing play */
     border-radius: 4px;
   }
 
@@ -164,7 +190,7 @@
     animation-duration: 14.12s;
     animation-direction: normal;
     animation-timing-function: linear;
-    animation-play-state: running;
+    animation-play-state: paused;
     background-size: 200%;
     /*first color: default background*/
     /*second color: color of the moving highlight*/
