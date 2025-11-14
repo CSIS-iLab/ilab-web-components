@@ -3,7 +3,7 @@
     tag: "csis-audio-highlight",
     props: {
       audioSrc: { attribute: "audio-src", type: "String" },
-      highlightColor: { attribute: "highlight-color", type: "String" },
+      highlightColor: { attribute: "highlight-text-color", type: "String" },
       highlightBg: { attribute: "highlight-bg", type: "String" },
       playColor: { attribute: "play-color", type: "String" },
     },
@@ -83,7 +83,7 @@
     class="highlight-span"
     class:animate={hasAnimated}
     onanimationend={handleAnimationEnd}
-    style={`--highlight-color:${highlightColor}; --highlight-background:${highlightBg}; --play:${playColor};`}
+    style={`--highlight-text-color:${highlightColor}; --highlight-background:${highlightBg}; --play:${playColor};`}
   >
     <audio id="myAudio" bind:this={myAudio} src={audioSrc}></audio>
 
@@ -151,7 +151,7 @@
   }
 
   #highlight {
-    color: var(--highlight-color); /* text being highlighted */
+    color: var(--highlight-text-color); /* text being highlighted */
   }
 
   #playIcon,
