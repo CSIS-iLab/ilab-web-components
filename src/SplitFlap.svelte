@@ -9,7 +9,7 @@
 
 <script>
   import { onMount } from "svelte";
-  import gsap from "https://cdn.skypack.dev/gsap@3.12.0";
+  import gsap from "gsap";
 
   let { text = "CSIS" } = $props();
 
