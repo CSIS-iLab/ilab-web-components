@@ -20,5 +20,8 @@
   },
   "dependencies": {
     "gsap": "^3.13.0"
+  },
+  "engines": {
+    "node": ">=22.0.0 < 24"
   }
 }
