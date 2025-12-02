@@ -14,6 +14,7 @@
         attribute: "background-image-alt-right",
         type: "String",
       },
+      btnText: { attribute: "btn-text", type: "String" },
     },
   }}
 />
@@ -28,6 +29,7 @@
     bgImageRight = "",
     backgroundImageAltRight = "",
     rightTitle = "right title",
+    btnText = "Read More",
   } = $props();
 
   let container = $state();
@@ -41,8 +43,8 @@
             --bg-image-right: url("${bgImageRight}")`}
 >
   <!-- container will be defined once this renders -->
-  <Left {container} {leftTitle} />
-  <Right {container} {rightTitle} />
+  <Left {container} {leftTitle} {btnText} />
+  <Right {container} {rightTitle} {btnText} />
 </div>
 
 <style>

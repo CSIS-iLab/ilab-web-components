@@ -1,5 +1,5 @@
 <script>
-  let { container, rightTitle } = $props();
+  let { container, rightTitle, btnText } = $props();
   let right;
 </script>
 
@@ -16,5 +16,5 @@
     quibusdam reprehenderit necessitatibus consequatur ea fugit autem ab
     sapiente atque! Quam.
   </p> -->
-  <a href="#" class="button">Read More</a>
+  <a href="#" class="button">{btnText}</a>
 </div>

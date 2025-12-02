@@ -1,20 +1,7 @@
 <script>
   // import { onMount } from "svelte"
-  let { container, leftTitle } = $props();
+  let { container, leftTitle, btnText } = $props();
   let left;
-
-  // $inspect( container )
-  // onMount(() => {
-  //   left = document.querySelector(".left")
-
-  //   left.addEventListener("mouseenter", () => {
-  //     container.classList.add("hover-left")
-  //   })
-
-  //   left.addEventListener("mouseleave", () => {
-  //     container.classList.remove("hover-left")
-  //   })
-  // })
 </script>
 
 <div
@@ -30,5 +17,5 @@
     quibusdam reprehenderit necessitatibus consequatur ea fugit autem ab
     sapiente atque! Quam.
   </p> -->
-  <a href="#" class="button">Read More</a>
+  <a href="#" class="button">{btnText}</a>
 </div>
