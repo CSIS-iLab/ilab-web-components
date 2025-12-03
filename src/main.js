@@ -7,3 +7,8 @@ import './BootcampPlayer.svelte';
 import './AudioHighlight.svelte';
 import './SplitFlap.svelte';
 import './AuthorGrid.svelte';
+import './lib/split-landing-page/Container.svelte';
+import './lib/test/Testing.svelte'
+import './lib/magnifier/Magnifier.svelte'
+import './lib/infinity-scroll/InfinityScroll.svelte'
+import './lib/text-typing/TextTyping.svelte'
