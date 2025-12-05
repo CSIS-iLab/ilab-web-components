@@ -1,4 +1,4 @@
-# CSIS Shorthand Widgets
+# iLab Web Components
 ## What is this?
 This is a repository for reusable, framework-agnostic web components for use inside [Shorthand](https://shorthand.com/) and other CSIS digital projects. Built with [Svelte 5 custom elements](https://svelte.dev/docs/svelte/custom-elements).
 
