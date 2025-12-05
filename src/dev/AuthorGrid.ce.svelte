@@ -1,3 +1,4 @@
+<!--TODO: add attributes for colors-->
 <svelte:options
   customElement={{
     tag: "csis-author-grid",

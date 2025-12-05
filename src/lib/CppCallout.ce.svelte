@@ -1,4 +1,3 @@
-<!-- Compiles directly to <x-cpp-callout> -->
 <svelte:options
   customElement={{
     tag: 'csis-cpp-callout',

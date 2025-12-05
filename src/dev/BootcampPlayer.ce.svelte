@@ -1,3 +1,4 @@
+<!--TODO: Add option to change font-->
 <svelte:options
   customElement={{
     tag: "csis-bootcamp-player",
