@@ -1,3 +1,4 @@
+<!--TODO: Finish media query updates, add updated text-->
 <svelte:options
   customElement={{
     tag: "csis-shorthand-footer",
