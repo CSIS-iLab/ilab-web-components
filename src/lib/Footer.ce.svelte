@@ -498,6 +498,15 @@
   /*-- --------------------------------------------------- --*/
   /*--                    Media Queries                    --*/
   /*-- --------------------------------------------------- --*/
+  @media screen and (max-width: 1280px) {
+    .container {
+      max-width: 1152px;
+    }
+
+    .footer__col.footer__csis {
+      max-width: 920px;
+    }
+  }
   @media screen and (max-width: 1024px) {
     .footer {
       padding-top: 2rem;
