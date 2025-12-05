@@ -1,9 +1,5 @@
-// Importing registers <x-cpp-callout>
-import './CppCallout.svelte';
-import './Callout.svelte';
-import './AudioBrief.svelte';
-import './Footer.svelte';
-import './BootcampPlayer.svelte';
-import './AudioHighlight.svelte';
-import './SplitFlap.svelte';
-import './AuthorGrid.svelte';
+// src/main.js
+const modules = import.meta.glob('./lib/**/*.ce.svelte', { eager: true });
+
+// TEMP: log what got pulled in so we can confirm
+console.log('Loaded components:', Object.keys(modules));
