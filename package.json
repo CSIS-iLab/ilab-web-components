@@ -5,8 +5,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev",
     "build": "vite build",
+    "build:dev-bundle": "vite build --mode dev-bundle",
     "preview": "vite preview --port 5173"
   },
   "keywords": [],
