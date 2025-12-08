@@ -10,7 +10,7 @@
 />
 
 <script>
-  let { textColor = "#fff", backgroundColor = "#4b4b4b" } = $props();
+  let { textColor = "#fff", backgroundColor = "#FFB6C1" } = $props();
 </script>
 
 <footer
