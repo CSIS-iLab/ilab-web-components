@@ -1,3 +1,4 @@
+<!--TODO: Finish media query updates, add updated text-->
 <svelte:options
   customElement={{
     tag: "csis-shorthand-footer",
@@ -218,7 +219,7 @@
       <!-- LEFT COLUMN: CSIS -->
       <div class="footer__col footer__csis">
         <p>
-          Established in Washington, D.C., nearly 60 years ago, the Center for
+          Established in Washington, D.C., in 1962, the Center for
           Strategic and International Studies (CSIS) is a bipartisan, nonprofit
           policy research organization dedicated to advancing practical ideas
           that address the world's greatest challenges.
@@ -389,7 +390,7 @@
   }
 
   .container {
-    max-width: 920px;
+    max-width: 1290px;
     margin: auto;
   }
 
@@ -476,7 +477,8 @@
   /*-- ------------------- Footer Text ------------------- --*/
   .footer__col.footer__csis {
     font-size: 0.9375rem;
-    max-width: 688px;
+    /* max-width: 688px; */
+    max-width: 950px;
   }
 
   .footer__col.footer__csis p {
@@ -498,6 +500,17 @@
   /*-- --------------------------------------------------- --*/
   /*--                    Media Queries                    --*/
   /*-- --------------------------------------------------- --*/
+  @media screen and (max-width: 1280px) {
+    .container {
+      max-width: 1152px;
+      padding-left: 40px;
+      padding-right: 40px;
+    }
+
+    .footer__col.footer__csis {
+      max-width: 920px;
+    }
+  }
   @media screen and (max-width: 1024px) {
     .footer {
       padding-top: 2rem;

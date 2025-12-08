@@ -1,13 +1,13 @@
-<!-- Compiles directly to <x-cpp-callout> -->
 <svelte:options
   customElement={{
     tag: 'csis-cpp-callout',
     props: {
-      href:       { type: 'String', reflect: true },             // used by image link (and default text link)
+      href:       { type: 'String'}, // used by image link (and default text link)
       imageSrc:   { attribute: 'image-src', type: 'String' },    // image URL
       imageAlt:   { attribute: 'image-alt', type: 'String' },    // image alt text
-      bg:         { type: 'String', reflect: true },             // background color
-      maxWidth:   { attribute: 'max-width', type: 'Number' }     // px
+      bg:         { type: 'String' },  // background color
+      textColor:  { attribute: 'text-color', type: 'String'}, // text color
+      maxWidth:   { attribute: 'max-width', type: 'Number' }  // in px
     }
   }}
 />
@@ -18,9 +18,30 @@
     imageSrc = 'https://res.cloudinary.com/csisideaslab/image/upload/v1704306843/hidden-reach/HR5-Snapshot-Header.jpg',
     imageAlt = 'Callout Image',
     bg = '#22484e',
+    textColor='#ffffff',
     maxWidth = 800
   } = $props();
 </script>
+
+<div
+  class="callout-container"
+  style={`--cpp-callout-bg:${bg}; max-width:${maxWidth}px; --cpp-callout-text:${textColor}`}
+>
+  <div class="callout-image">
+    <a href={href}>
+      <img src={imageSrc} alt={imageAlt} />
+    </a>
+  </div>
+
+  <div class="callout-text">
+    <!-- If no slot provided, show a sensible default message that links to href -->
+    <slot>
+      This Hidden Reach <a href={href}>Snapshot</a> uses satellite imagery to
+      reveal how China is quietly using submarine diplomacy to deepen its
+      influence along the Bay of Bengal.
+    </slot>
+  </div>
+</div>
 
 <style>
   /* Shadow DOM styles — encapsulated by default */
@@ -37,7 +58,7 @@
     background-color: var(--cpp-callout-bg, #22484e);
     max-width: 800px;
     margin: auto;
-    color: #f8f7f7;
+    color: var(--cpp-callout-text, #f8f7f7);
   }
 
   .callout-image {
@@ -89,23 +110,3 @@
     }
   }
 </style>
-
-<div
-  class="callout-container"
-  style={`--cpp-callout-bg:${bg}; max-width:${maxWidth}px`}
->
-  <div class="callout-image">
-    <a href={href}>
-      <img src={imageSrc} alt={imageAlt} />
-    </a>
-  </div>
-
-  <div class="callout-text">
-    <!-- If no slot provided, show a sensible default message that links to href -->
-    <slot>
-      This Hidden Reach <a href={href}>Snapshot</a> uses satellite imagery to
-      reveal how China is quietly using submarine diplomacy to deepen its
-      influence along the Bay of Bengal.
-    </slot>
-  </div>
-</div>

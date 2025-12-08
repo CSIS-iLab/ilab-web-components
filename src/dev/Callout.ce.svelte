@@ -1,4 +1,4 @@
-<!-- src/Callout.svelte -->
+<!-- src/Callout.svelte; for testing/example only -->
 <svelte:options
   customElement={{
     tag: 'csis-callout',

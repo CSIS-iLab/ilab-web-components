@@ -56,7 +56,7 @@
   let {
     /* content and sources */
     title = "Audio Brief",
-    audioSrc = "",
+    audioSrc = "https://res.cloudinary.com/csisideaslab/video/upload/v1707945697/Shorthand/Global%20Forecast/G_Allen_GFAB_vF_mixdown.mp3",
     transcriptSrc = "",
     bgImage = "",
     backgroundImageAlt = "",

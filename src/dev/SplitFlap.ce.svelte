@@ -1,3 +1,4 @@
+<!--TODO: attributes for things other than text-->
 <svelte:options
   customElement={{
     tag: "csis-splitflap",
