@@ -117,7 +117,7 @@ This file controls how Vite builds the component library. It produces two differ
 Detailed instructions are below (and must be followed for this to work properly) but the general idea is here:
 
 - Clone the repo, run `npm install`, start the dev server, check that `localhost:5173` is serving `index.html`.
-- Create a branch for your component - all dev work goes here
+- Create a branch for your component - all dev work goes here. If you're working on multiple, each gets its own branch.
 - In `dev/`, create and build your component.  
   - SINGLE FILE components stay in `dev/`
   - MULTI FILE components get their own folder: `dev/component-name/`
@@ -136,7 +136,8 @@ Say we want to build `cool-component`:
 ### Setup
 - Make sure you have Node 20+ and npm
 - Clone repo down locally
-- From `main`, create and checkout a branch for your component, like `feat/cool-component`
+- From `main`, create and checkout a branch for your component, like `feat/cool-component`.
+  - A branch is for dev of a single component. If you have others, they'll need their own branches.
 - Run `npm install`
 - Run `npm run dev` to get the local server running. Check `localhost:5173` to make sure that what's in `index.html` is running.
 
