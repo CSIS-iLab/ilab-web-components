@@ -168,7 +168,7 @@ Say we want to build `cool-component`:
 - You do NOT need to run any build command. That will be done on `main`.
 
 ### Make a Pull Request
--  Once your happy with how your component is performing in Shorthand, it's time to make a PR to merge your branch to `main`.
+-  Once you're happy with how your component is performing in Shorthand, it's time to make a PR to merge your branch to `main`.
 -  Your PR should 
    -  Describe your component AND define any attributes it has for documentation. These should be written down as they'd be used by producers/users (e.g. "text-color") not as they are in the JS (e.g. "textColor").
       -  e.g. "`text-color` - The color of all text" 
