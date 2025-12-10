@@ -24,7 +24,7 @@
     p2 = "typing animation effect",
     p3 = "in pure CSS.",
     bgColor = "#ffcc00",
-    animationDuration = 5,
+    animationDuration = "5s",
     /* fonts */
     fontUrl = "",
     fontFamily = "'IBM Plex Sans', system-ui, sans-serif",
