@@ -6,20 +6,51 @@
       p2: { attribute: "second-p", type: "String" },
       p3: { attribute: "third-p", type: "String" },
       bgColor: { attribute: "bg-color", type: "String" },
+
+      /* fonts */
+      fontUrl: { attribute: "font-url", type: "String" },
+      fontFamily: { attribute: "font-family", type: "String" },
+      fontSize: { attribute: "font-size", type: "String" },
+      fontColor: { attribute: "font-color", type: "String" },
     },
   }}
 />
 
 <script>
+  import { onMount } from "svelte";
   let {
     p1 = "Text slider with",
     p2 = "typing animation effect",
     p3 = "in pure CSS.",
     bgColor = "#ffcc00",
+    /* fonts */
+    fontUrl = "",
+    fontFamily = "'IBM Plex Sans', system-ui, sans-serif",
+    fontSize = "1rem",
+    fontColor = "#000",
   } = $props();
+
+  onMount(() => {
+    if (!fontUrl) return;
+
+    // avoid adding duplicate <link> tags if multiple components use same font
+    const existing = document.querySelector(
+      `link[data-csis-font="${fontUrl}"]`,
+    );
+    if (existing) return;
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = fontUrl;
+    link.dataset.csisFont = fontUrl;
+    document.head.appendChild(link);
+  });
 </script>
 
-<div class="container" style={`--bg-color: ${bgColor}`}>
+<div
+  class="container"
+  style={`--bg-color: ${bgColor}; --font-size: ${fontSize}; --font-color: ${fontColor}; --typing-font-family: ${fontFamily};`}
+>
   <div class="typing-slider">
     <p>{p1}</p>
     <p>{p2}</p>
@@ -28,12 +59,16 @@
 </div>
 
 <style>
+  :host {
+    display: block;
+  }
+
   .container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: var(--bg-color);
+    background-color: var(--bg-color, #333);
   }
   @keyframes cursor {
     from,
@@ -55,7 +90,7 @@
   }
   @keyframes slide {
     33.3333333333% {
-      font-size: 3rem;
+      font-size: var(--font-size);
       letter-spacing: 3px;
     }
     to {
@@ -64,8 +99,10 @@
     }
   }
   .typing-slider {
-    font-family: Consolas, monospace;
+    font-family: var(--typing-font-family);
     font-weight: bold;
+    font-size: var(--font-size);
+    color: var(--font-color);
     text-align: center;
     white-space: nowrap;
   }
