@@ -6,6 +6,7 @@
       p2: { attribute: "second-p", type: "String" },
       p3: { attribute: "third-p", type: "String" },
       bgColor: { attribute: "bg-color", type: "String" },
+      animationDuration: { attribute: "animation-duration", type: "String" },
 
       /* fonts */
       fontUrl: { attribute: "font-url", type: "String" },
@@ -23,6 +24,7 @@
     p2 = "typing animation effect",
     p3 = "in pure CSS.",
     bgColor = "#ffcc00",
+    animationDuration = 5,
     /* fonts */
     fontUrl = "",
     fontFamily = "'IBM Plex Sans', system-ui, sans-serif",
@@ -49,7 +51,11 @@
 
 <div
   class="container"
-  style={`--bg-color: ${bgColor}; --font-size: ${fontSize}; --font-color: ${fontColor}; --typing-font-family: ${fontFamily};`}
+  style={`--bg-color: ${bgColor};
+    --font-size: ${fontSize};
+    --font-color: ${fontColor};
+    --typing-font-family: ${fontFamily};
+    --animation-duration: ${animationDuration}`}
 >
   <div class="typing-slider">
     <p>{p1}</p>
@@ -123,7 +129,7 @@
     border-left: 3px solid black;
     background-color: var(--bg-color);
     animation:
-      typing 5s infinite,
+      typing var(--animation-duration) infinite,
       cursor 1s infinite;
   }
   .typing-slider p:nth-child(1) {
