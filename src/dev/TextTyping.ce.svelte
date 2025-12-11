@@ -60,7 +60,10 @@
   <div class="typing-slider">
     <p>{p1}</p>
     <p>{p2}</p>
-    <p>{p3}</p>
+    <p class="has-cursor">
+      {p3}
+      <span class="final-cursor" aria-hidden="true"></span>
+    </p>
   </div>
 </div>
 
@@ -75,39 +78,18 @@
     justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
-    padding: 0 1.5rem; /* space from viewport edges */
+    padding: 0 1.5rem;
     background-color: var(--bg-color, #333);
     box-sizing: border-box;
   }
 
-  @keyframes cursor {
-    from,
-    to {
-      border-color: transparent;
-    }
-    50% {
-      border-color: black;
-    }
-  }
-
-  @keyframes typing {
+  /* cover animation: reveals text */
+  @keyframes typing-line {
     from {
       width: 100%;
     }
-    90%,
     to {
       width: 0;
-    }
-  }
-
-  @keyframes slide {
-    33.3333333% {
-      font-size: clamp(1rem, 5vw, var(--font-size, 2.5rem));
-      letter-spacing: 0.08em;
-    }
-    to {
-      font-size: 0;
-      letter-spacing: 0;
     }
   }
 
@@ -118,56 +100,84 @@
     color: var(--font-color, #000);
     text-align: left;
     white-space: nowrap;
-
-    /* just constrain the whole block, don't fight the p/::after geometry */
-    /*max-width: 40rem;*/
     margin-inline: auto;
   }
 
   .typing-slider p {
-    max-width: 380px;
-    text-align: left;
     position: relative;
-    display: inline; /* back to inline, like the original tricks */
-    font-size: 0;
-    /*text-transform: uppercase;*/
-    letter-spacing: 0;
-    animation: slide 15s step-start infinite;
+    display: block;
+    margin: 0.25em 0;
+    font-size: inherit;
+    letter-spacing: 0.08em;
   }
 
-  .typing-slider p::after {
+  /* cover each line with ::before */
+  .typing-slider p::before {
     content: "";
     position: absolute;
     top: 0;
-    right: 0;
+    right: 0; /* cover from the right */
     bottom: 0;
-    border-left: 2px solid black;
+    width: 100%; /* start fully covered */
     background-color: var(--bg-color, #333);
-    animation:
-      typing var(--animation-duration, 5s) infinite,
-      cursor 1s infinite;
+
+    animation-name: typing-line;
+    animation-duration: var(--animation-duration, 5s);
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
   }
 
-  .typing-slider p:nth-child(1) {
+  /* line 1 types first */
+  .typing-slider p:nth-child(1)::before {
     animation-delay: 0s;
+    animation-timing-function: steps(16, end);
   }
-  .typing-slider p:nth-child(1)::after {
-    animation-delay: 0s;
-    animation-timing-function: steps(16), step-end;
+
+  /* line 2 starts after line 1 */
+  .typing-slider p:nth-child(2)::before {
+    animation-delay: calc(1 * var(--animation-duration, 5s));
+    animation-timing-function: steps(23, end);
   }
-  .typing-slider p:nth-child(2) {
-    animation-delay: 5s;
+
+  /* line 3 starts after line 2 */
+  .typing-slider p:nth-child(3)::before {
+    animation-delay: calc(2 * var(--animation-duration, 5s));
+    animation-timing-function: steps(12, end);
   }
-  .typing-slider p:nth-child(2)::after {
-    animation-delay: 5s;
-    animation-timing-function: steps(23), step-end;
+
+  @keyframes cursor-blink {
+    0%,
+    50% {
+      border-left-color: transparent;
+    }
+    51%,
+    100% {
+      border-left-color: black;
+    }
   }
-  .typing-slider p:nth-child(3) {
-    animation-delay: 10s;
+
+  /* last line wrapper */
+  .typing-slider p.has-cursor {
+    position: relative;
   }
-  .typing-slider p:nth-child(3)::after {
-    animation-delay: 10s;
-    animation-timing-function: steps(12), step-end;
+
+  /* the final cursor itself */
+  .typing-slider p.has-cursor .final-cursor {
+    position: absolute;
+    top: 0;
+    right: 0; /* sit at the end of the text */
+    bottom: 0;
+    width: 0; /* we only need the border */
+    border-left: 2px solid transparent; /* invisible until blink starts */
+
+    animation-name: cursor-blink;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: step-end;
+
+    /* start blinking AFTER the last line is done typing:
+       3 * duration = line1 + line2 + line3 */
+    animation-delay: calc(3 * var(--animation-duration, 5s));
   }
 
   /* ====== SMALL: 620px – 899.98px ====== */
@@ -179,25 +189,6 @@
     .typing-slider {
       font-size: clamp(1.25rem, 3.5vw, var(--font-size, 3rem));
     }
-
-    .typing-slider p {
-      max-width: 644px;
-    }
-
-    @keyframes slide {
-      33.3333333% {
-        font-size: clamp(1.25rem, 3.5vw, var(--font-size, 3rem));
-        letter-spacing: 0.1em;
-      }
-      to {
-        font-size: 0;
-        letter-spacing: 0;
-      }
-    }
-
-    .typing-slider p::after {
-      border-left-width: 3px;
-    }
   }
 
   /* ====== MEDIUM: 900px & above ====== */
@@ -208,25 +199,6 @@
 
     .typing-slider {
       font-size: var(--font-size, 3rem);
-    }
-
-    .typing-slider p {
-      max-width: 1109px;
-    }
-
-    @keyframes slide {
-      33.3333333% {
-        font-size: var(--font-size, 3rem);
-        letter-spacing: 0.12em;
-      }
-      to {
-        font-size: 0;
-        letter-spacing: 0;
-      }
-    }
-
-    .typing-slider p::after {
-      border-left-width: 3px;
     }
   }
 </style>
