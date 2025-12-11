@@ -114,7 +114,7 @@
     font-size: clamp(1rem, 5vw, var(--font-size, 2.5rem));
     color: var(--font-color, #000);
     text-align: left;
-    white-space: nowrap;
+    white-space: normal;
     margin-inline: auto;
   }
 
@@ -181,6 +181,7 @@
 
     .typing-slider {
       font-size: clamp(1.25rem, 3.5vw, var(--font-size, 3rem));
+      white-space: nowrap;
     }
   }
 
@@ -192,6 +193,7 @@
 
     .typing-slider {
       font-size: var(--font-size, 3rem);
+      white-space: nowrap;
     }
   }
 </style>
