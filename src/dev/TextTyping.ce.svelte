@@ -5,6 +5,10 @@
       p1: { attribute: "first-p", type: "String" },
       p2: { attribute: "second-p", type: "String" },
       p3: { attribute: "third-p", type: "String" },
+
+      // NEW: dynamic lines as JSON string
+      lines: { attribute: "lines", type: "String" },
+
       bgColor: { attribute: "bg-color", type: "String" },
       animationDuration: { attribute: "animation-duration", type: "String" },
 
@@ -13,29 +17,41 @@
       fontFamily: { attribute: "font-family", type: "String" },
       fontSize: { attribute: "font-size", type: "String" },
       fontColor: { attribute: "font-color", type: "String" },
+
+      // NEW: cursor color
+      cursorColor: { attribute: "cursor-color", type: "String" },
     },
   }}
 />
 
 <script>
   import { onMount } from "svelte";
+
   let {
     p1 = "Text slider with",
     p2 = "typing animation effect",
     p3 = "in pure CSS.",
+
+    // NEW: optional JSON array of lines
+    lines: linesJson = "",
+
     bgColor = "#ffcc00",
     animationDuration = "5s",
+
     /* fonts */
     fontUrl = "",
     fontFamily = "'IBM Plex Sans', system-ui, sans-serif",
     fontSize = "1rem",
     fontColor = "#000",
+
+    // NEW: cursor color prop
+    cursorColor = "#000",
   } = $props();
 
+  // --- font loading stays the same ---
   onMount(() => {
     if (!fontUrl) return;
 
-    // avoid adding duplicate <link> tags if multiple components use same font
     const existing = document.querySelector(
       `link[data-csis-font="${fontUrl}"]`,
     );
@@ -47,6 +63,46 @@
     link.dataset.csisFont = fontUrl;
     document.head.appendChild(link);
   });
+
+  // --- helper: parse "5s" / "5000ms" / "5" into seconds ---
+  function durationToSeconds(str) {
+    if (!str) return 5;
+    const trimmed = String(str).trim().toLowerCase();
+
+    if (trimmed.endsWith("ms")) {
+      const num = parseFloat(trimmed.slice(0, -2));
+      return isNaN(num) ? 5 : num / 1000;
+    }
+    if (trimmed.endsWith("s")) {
+      const num = parseFloat(trimmed.slice(0, -1));
+      return isNaN(num) ? 5 : num;
+    }
+    const num = parseFloat(trimmed);
+    return isNaN(num) ? 5 : num;
+  }
+
+  const lineDurationSeconds = durationToSeconds(animationDuration);
+
+  // --- compute lines array: JSON attribute takes precedence, fall back to p1/p2/p3 ---
+  /** @type {string[]} */
+  let lines = [];
+
+  if (linesJson && linesJson.trim()) {
+    try {
+      const parsed = JSON.parse(linesJson);
+      if (Array.isArray(parsed)) {
+        lines = parsed.map((l) => String(l)).filter((l) => l.trim().length > 0);
+      }
+    } catch (_e) {
+      // ignore parse error, fall back to p1/p2/p3
+    }
+  }
+
+  if (!lines.length) {
+    lines = [p1, p2, p3].filter((l) => l && l.trim().length > 0);
+  }
+
+  const totalLines = lines.length;
 </script>
 
 <div
@@ -55,12 +111,29 @@
     --font-size: ${fontSize};
     --font-color: ${fontColor};
     --typing-font-family: ${fontFamily};
-    --animation-duration: ${animationDuration}`}
+    --line-duration: ${lineDurationSeconds};
+    --cursor-color: ${cursorColor};`}
 >
   <div class="typing-slider">
-    <p><span class="line line-1">{p1}</span></p>
-    <p><span class="line line-2">{p2}</span></p>
-    <p><span class="line line-3">{p3}</span></p>
+    {#each lines as line, index}
+      <!-- For each line we set per-line CSS vars: --typing-delay: when its typing
+      starts --cursor-delay: when blinking starts (after ALL lines typed)
+      --cursor-iterations: 0 for all but last line; infinite for last line
+      --typing-steps: approximate number of "characters" for steps() -->
+      <p>
+        <span
+          class="line"
+          style={`
+            --typing-delay: ${index * lineDurationSeconds}s;
+            --cursor-delay: ${totalLines * lineDurationSeconds}s;
+            --cursor-iterations: ${index === totalLines - 1 ? "infinite" : "0"};
+            --typing-steps: ${Math.max(line.length, 1)};
+          `}
+        >
+          {line}
+        </span>
+      </p>
+    {/each}
   </div>
 </div>
 
@@ -84,11 +157,11 @@
   @keyframes typingLine {
     0% {
       width: 100%;
-      border-left-color: black;
+      border-left-color: var(--cursor-color, #000);
     }
     99% {
       width: 0;
-      border-left-color: black;
+      border-left-color: var(--cursor-color, #000);
     }
     100% {
       width: 0;
@@ -104,7 +177,7 @@
     }
     51%,
     100% {
-      border-left-color: black;
+      border-left-color: var(--cursor-color, #000);
     }
   }
 
@@ -141,36 +214,11 @@
 
     /* two animations: typing + (optional) blink */
     animation-name: typingLine, cursorBlink;
-    animation-duration: var(--animation-duration, 5s), 1s;
-    animation-iteration-count: 1, 0; /* blink off by default */
+    animation-duration: calc(var(--line-duration, 5) * 1s), 1s;
+    animation-delay: var(--typing-delay, 0s), var(--cursor-delay, 0s);
+    animation-iteration-count: 1, var(--cursor-iterations, 0);
+    animation-timing-function: steps(var(--typing-steps, 20), end), step-end;
     animation-fill-mode: forwards, none;
-  }
-
-  /* line 1: types from 0 → D, no blinking */
-  .typing-slider .line-1::after {
-    animation-delay: 0s, var(--animation-duration, 5s);
-    animation-timing-function: steps(16, end), step-end;
-  }
-
-  /* line 2: types from D → 2D, no blinking */
-  .typing-slider .line-2::after {
-    animation-delay:
-      var(--animation-duration, 5s), calc(2 * var(--animation-duration, 5s));
-    animation-timing-function: steps(23, end), step-end;
-  }
-
-  /* line 3: types from 2D → 3D, then cursor blinks forever */
-  .typing-slider .line-3::after {
-    /* typing from 2D to 3D, blink starts at 3D */
-    animation-delay:
-      calc(2 * var(--animation-duration, 5s)),
-      calc(3 * var(--animation-duration, 5s));
-
-    animation-timing-function:
-      steps(40, end), step-end; /* 40 ≈ chars in line 3 */
-
-    /* typing once, blink forever */
-    animation-iteration-count: 1, infinite;
   }
 
   /* ====== SMALL: 620px – 899.98px ====== */
@@ -181,7 +229,6 @@
 
     .typing-slider {
       font-size: clamp(1.25rem, 3.5vw, var(--font-size, 3rem));
-      white-space: nowrap;
     }
   }
 
@@ -193,7 +240,6 @@
 
     .typing-slider {
       font-size: var(--font-size, 3rem);
-      white-space: nowrap;
     }
   }
 </style>
