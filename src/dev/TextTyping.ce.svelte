@@ -6,19 +6,16 @@
       p2: { attribute: "second-p", type: "String" },
       p3: { attribute: "third-p", type: "String" },
 
-      // NEW: dynamic lines as JSON string
       lines: { attribute: "lines", type: "String" },
 
       bgColor: { attribute: "bg-color", type: "String" },
       animationDuration: { attribute: "animation-duration", type: "String" },
 
-      /* fonts */
       fontUrl: { attribute: "font-url", type: "String" },
       fontFamily: { attribute: "font-family", type: "String" },
       fontSize: { attribute: "font-size", type: "String" },
       fontColor: { attribute: "font-color", type: "String" },
 
-      // NEW: cursor color
       cursorColor: { attribute: "cursor-color", type: "String" },
     },
   }}
@@ -84,8 +81,8 @@
   const lineDurationSeconds = durationToSeconds(animationDuration);
 
   // --- compute lines array: JSON attribute takes precedence, fall back to p1/p2/p3 ---
-  /** @type {string[]} */
-  let lines = [];
+
+  let lines = $state([]);
 
   if (linesJson && linesJson.trim()) {
     try {
