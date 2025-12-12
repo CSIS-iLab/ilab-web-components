@@ -2,7 +2,6 @@
   customElement={{
     tag: "csis-magnifier",
     props: {
-      title: { attribute: "title", type: "String" },
       bgImage: { attribute: "background-image", type: "String" },
       bgImageAlt: {
         attribute: "background-image-alt",
@@ -17,7 +16,6 @@
   import { onMount, onDestroy } from "svelte";
 
   let {
-    title = "",
     bgImage = "https://res.cloudinary.com/csisideaslab/image/upload/v1729626172/dev-team/smfeogcut8mzuv4rxge3.png",
     bgImageAlt = "Saint Seiya",
     magnifierZoom = 2,
