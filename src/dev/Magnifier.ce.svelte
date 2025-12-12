@@ -7,7 +7,14 @@
         attribute: "background-image-alt",
         type: "String",
       },
-      magnifierZoom: { attribute: "magnifier-zoom", type: "Number" },
+      magnifierZoom: {
+        attribute: "magnifier-zoom",
+        type: "Number",
+      },
+      magnifierBorderColor: {
+        attribute: "magnifier-border-color",
+        type: "String",
+      },
     },
   }}
 />
@@ -19,6 +26,7 @@
     bgImage = "https://res.cloudinary.com/csisideaslab/image/upload/v1729626172/dev-team/smfeogcut8mzuv4rxge3.png",
     bgImageAlt = "Saint Seiya",
     magnifierZoom = 2,
+    magnifierBorderColor = "#000",
   } = $props();
 
   let img; // we'll bind the <img> element here
@@ -109,7 +117,10 @@
   });
 </script>
 
-<div class="img-magnifier-container">
+<div
+  class="img-magnifier-container"
+  style={`--magnifier-border-color: ${magnifierBorderColor};`}
+>
   <img bind:this={img} src={bgImage} alt={bgImageAlt} />
 </div>
 
@@ -136,7 +147,7 @@
     }
     .img-magnifier-glass {
       position: absolute;
-      border: 3px solid #000;
+      border: 3px solid var(--magnifier-border-color);
       border-radius: 50%;
       cursor: none;
       /*Set the size of the magnifier glass:*/
