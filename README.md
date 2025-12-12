@@ -201,6 +201,8 @@ Once your PR is approved, it's time to merge and update the library!
 
 And that's it! A new release has been created! Any Shorthand stories waiting on your new component should use the new version, and any documentation should be updated to reflect the new version.
 
+The URL for your new release is: `<script src="https://cdn.jsdelivr.net/gh/CSIS-iLab/ilab-web-components@VERSION_HERE/dist/widgets.js"></script>` where `VERSION_HERE` is whatever the version was, `v0.1.0` or `v1.3.0` etc.
+
 And old stories or web pages that are using an old version do _not_ need to be updated. Because we're telling jsDelivr to reference specific commits by using tags, those old stories will always reference that specific working version of the `widgets.js` file. It will not be broken or updated by our future versions.
 
 ## Brief Guidelines for Components
