@@ -22,17 +22,20 @@
 />
 
 <script>
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
 
   let {
+    // preferred single-text input (supports \n and blank lines)
+    text: textRaw = "",
+
+    // existing fallbacks
     p1 = "Text slider with",
     p2 = "typing animation effect",
     p3 = "in pure CSS.",
-
-    // NEW: optional JSON array of lines
     lines: linesJson = "",
 
     bgColor = "#ffcc00",
+    cursorColor = "#000",
     animationDuration = "5s",
 
     /* fonts */
@@ -41,16 +44,16 @@
     fontSize = "1rem",
     fontColor = "#000",
 
-    // NEW: cursor color prop
-    cursorColor = "#000",
+    // height control (defaults to hero)
+    minHeight = "100vh", //attribute: min-height="60vh" or "600px"
   } = $props();
 
-  // --- font loading stays the same ---
+  /* -------------------- font loading -------------------- */
   onMount(() => {
     if (!fontUrl) return;
 
     const existing = document.querySelector(
-      `link[data-csis-font="${fontUrl}"]`,
+      `link[data-csis-font="${fontUrl}"]`
     );
     if (existing) return;
 
@@ -61,45 +64,99 @@
     document.head.appendChild(link);
   });
 
-  // --- helper: parse "5s" / "5000ms" / "5" into seconds ---
-  function durationToSeconds(str) {
-    if (!str) return 5;
+  /* --------------------- parse time --------------------- */
+  function durationToMs(str) {
+    if (!str) return 5000;
     const trimmed = String(str).trim().toLowerCase();
-
     if (trimmed.endsWith("ms")) {
       const num = parseFloat(trimmed.slice(0, -2));
-      return isNaN(num) ? 5 : num / 1000;
+      return Number.isFinite(num) ? num : 5000;
     }
     if (trimmed.endsWith("s")) {
       const num = parseFloat(trimmed.slice(0, -1));
-      return isNaN(num) ? 5 : num;
+      return Number.isFinite(num) ? num * 1000 : 5000;
     }
     const num = parseFloat(trimmed);
-    return isNaN(num) ? 5 : num;
+    return Number.isFinite(num) ? num * 1000 : 5000;
   }
 
-  const lineDurationSeconds = durationToSeconds(animationDuration);
+  /* ------------- turn \n into real newlines ------------- */
+  function unescapeNewlines(s) {
+    return String(s)
+      .replaceAll("\\r\\n", "\n")
+      .replaceAll("\\n", "\n")
+      .replaceAll("\\r", "\n");
+  }
 
-  // --- compute lines array: JSON attribute takes precedence, fall back to p1/p2/p3 ---
+  function buildSourceText() {
+    // 1) text prop wins
+    if (textRaw && String(textRaw).trim().length) {
+      return unescapeNewlines(textRaw);
+    }
 
-  let lines = $state([]);
-
-  if (linesJson && linesJson.trim()) {
-    try {
-      const parsed = JSON.parse(linesJson);
-      if (Array.isArray(parsed)) {
-        lines = parsed.map((l) => String(l)).filter((l) => l.trim().length > 0);
+    // 2) JSON lines text (IMPORTANT: keep empty strings for blank lines)
+    if (linesJson && String(linesJson).trim().lenghth) {
+      try {
+        const parsed = JSON.parse(linesJson);
+        if (Array.isArray(parsed)) {
+          return parsed.map((l) => (l == null ? "" : String(l))).join("\n");
+        }
+      } catch {
+        // ignore
       }
-    } catch (_e) {
-      // ignore parse error, fall back to p1/p2/p3
+    }
+
+    // 3) p1/p2/p3 fallback
+    return [p1, p2, p3].filter((l) => l && String(l).trim().length).join("\n");
+  }
+
+  let sourceText = $state(buildSourceText());
+  let displayedText = $state("");
+  let done = $state(false);
+
+  let typingTimer = null;
+
+  function stopTyping() {
+    if (typingTimer) {
+      clearInterval(typingTimer);
+      typingTimer = null;
     }
   }
 
-  if (!lines.length) {
-    lines = [p1, p2, p3].filter((l) => l && l.trim().length > 0);
+  async function startTyping() {
+    stopTyping();
+    done = false;
+    displayedText = "";
+
+    // wait for DOM update so wrapping/layout is corect before typing starts
+    await tick();
+
+    const full = sourceText ?? "";
+    if (!full.length) {
+      done = true;
+      return;
+    }
+
+    const totalMs = durationToMs(animationDuration);
+    const steps = Math.max(full.length, 1);
+    const intervalMs = Math.max(10, Math.floor(totalMs / steps));
+
+    let i = 0;
+    typingtimer = setInterval(() => {
+      i += 1;
+      displayedText = full.slice(0, i);
+      if (i >= full.length) {
+        stopTyping();
+        done = true;
+      }
+    }, intervalMs);
   }
 
-  const totalLines = lines.length;
+  onMount(() => {
+    sourceText = buildSourceText();
+    startTyping();
+    return stopTyping;
+  });
 </script>
 
 <div
@@ -108,29 +165,12 @@
     --font-size: ${fontSize};
     --font-color: ${fontColor};
     --typing-font-family: ${fontFamily};
-    --line-duration: ${lineDurationSeconds};
-    --cursor-color: ${cursorColor};`}
+    --cursor-color: ${cursorColor};
+    --min-height: ${minHeight};`}
 >
-  <div class="typing-slider">
-    {#each lines as line, index}
-      <!-- For each line we set per-line CSS vars: --typing-delay: when its typing
-      starts --cursor-delay: when blinking starts (after ALL lines typed)
-      --cursor-iterations: 0 for all but last line; infinite for last line
-      --typing-steps: approximate number of "characters" for steps() -->
-      <p>
-        <span
-          class="line"
-          style={`
-            --typing-delay: ${index * lineDurationSeconds}s;
-            --cursor-delay: ${totalLines * lineDurationSeconds}s;
-            --cursor-iterations: ${index === totalLines - 1 ? "infinite" : "0"};
-            --typing-steps: ${Math.max(line.length, 1)};
-          `}
-        >
-          {line}
-        </span>
-      </p>
-    {/each}
+  <div class="typing">
+    <span class="typed">{displayedText}</span>
+    <span class:done class="cursor" aria-hidden="true"></span>
   </div>
 </div>
 
@@ -144,29 +184,30 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    min-height: 100vh;
+    min-height: var(--min-height, 100vh);
     padding: 0 1.5rem;
     background-color: var(--bg-color, #333);
     box-sizing: border-box;
   }
 
-  /* cover + typing on each line */
-  @keyframes typingLine {
-    0% {
-      width: 100%;
-      border-left-color: var(--cursor-color, #000);
-    }
-    99% {
-      width: 0;
-      border-left-color: var(--cursor-color, #000);
-    }
-    100% {
-      width: 0;
-      border-left-color: transparent; /* hide cursor at end for this line */
-    }
+  .typing {
+    font-family: var(--typing-font-family);
+    font-weight: bold;
+    font-size: clamp(1rem, 5vw, var(--font-size, 2.5rem));
+    color: var(--font-color, #000);
+    text-align: left;
+
+    /* ✅ this is the magic for responsiveness + blank lines */
+    white-space: pre-wrap; /* preserves \n and wraps */
+    overflow-wrap: anywhere; /* prevents overflow on long tokens */
+    max-width: 100%;
+    margin-inline: auto;
   }
 
-  /* blink for final cursor (last line only) */
+  .typed {
+    /* keep it inline so cursor sits right after the last char */
+  }
+
   @keyframes cursorBlink {
     0%,
     50% {
@@ -178,44 +219,23 @@
     }
   }
 
-  .typing-slider {
-    font-family: var(--typing-font-family);
-    font-weight: bold;
-    font-size: clamp(1rem, 5vw, var(--font-size, 2.5rem));
-    color: var(--font-color, #000);
-    text-align: left;
-    white-space: nowrap;
-    margin-inline: auto;
+  .cursor {
+    display: inline-block;
+    border-left: 2px solid var(--cursor-color, #000);
+    margin-left: 0.08em;
+    height: 1em;
+    vertical-align: -0.1em;
+    animation: cursorBlink 1s step-end infinite;
   }
 
-  .typing-slider p {
-    margin: 0.25em 0;
+  /* Optional: if you want cursor to blink only AFTER typing is done,
+   remove the animation by default and enable when done is true. */
+  .cursor:not(.done) {
+    /* comment out next line if you want it blinking while typing */
+    animation: none;
   }
-
-  /* The actual typed line (shrinks to text width) */
-  .typing-slider .line {
-    position: relative;
-    display: inline-block; /* width = text width */
-  }
-
-  /* base: all lines get a typing cover, no blink by default */
-  .typing-slider .line::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0; /* cover from the right edge of text */
-    bottom: 0;
-    width: 100%;
-    border-left: 2px solid transparent;
-    background-color: var(--bg-color, #333);
-
-    /* two animations: typing + (optional) blink */
-    animation-name: typingLine, cursorBlink;
-    animation-duration: calc(var(--line-duration, 5) * 1s), 1s;
-    animation-delay: var(--typing-delay, 0s), var(--cursor-delay, 0s);
-    animation-iteration-count: 1, var(--cursor-iterations, 0);
-    animation-timing-function: steps(var(--typing-steps, 20), end), step-end;
-    animation-fill-mode: forwards, none;
+  .cursor.done {
+    animation: cursorBlink 1s step-end infinite;
   }
 
   /* ====== SMALL: 620px – 899.98px ====== */
@@ -224,7 +244,7 @@
       padding: 0 2rem;
     }
 
-    .typing-slider {
+    .typing {
       font-size: clamp(1.25rem, 3.5vw, var(--font-size, 3rem));
     }
   }
@@ -235,7 +255,7 @@
       padding: 0 3rem;
     }
 
-    .typing-slider {
+    .typing {
       font-size: var(--font-size, 3rem);
     }
   }
