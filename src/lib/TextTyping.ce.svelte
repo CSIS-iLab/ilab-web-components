@@ -17,6 +17,8 @@
       fontColor: { attribute: "font-color", type: "String" },
 
       cursorColor: { attribute: "cursor-color", type: "String" },
+
+      minHeight: { attribute: "min-height", type: "String" }
     },
   }}
 />
@@ -95,7 +97,7 @@
     }
 
     // 2) JSON lines text (IMPORTANT: keep empty strings for blank lines)
-    if (linesJson && String(linesJson).trim().lenghth) {
+    if (linesJson && String(linesJson).trim().length) {
       try {
         const parsed = JSON.parse(linesJson);
         if (Array.isArray(parsed)) {
@@ -142,7 +144,7 @@
     const intervalMs = Math.max(10, Math.floor(totalMs / steps));
 
     let i = 0;
-    typingtimer = setInterval(() => {
+    typingTimer = setInterval(() => {
       i += 1;
       displayedText = full.slice(0, i);
       if (i >= full.length) {
