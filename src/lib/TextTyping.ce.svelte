@@ -2,11 +2,7 @@
   customElement={{
     tag: "csis-text-typing",
     props: {
-      p1: { attribute: "first-p", type: "String" },
-      p2: { attribute: "second-p", type: "String" },
-      p3: { attribute: "third-p", type: "String" },
-
-      lines: { attribute: "lines", type: "String" },
+      text: { attribute: "text", type: "String"},
 
       bgColor: { attribute: "bg-color", type: "String" },
       animationDuration: { attribute: "animation-duration", type: "String" },
@@ -29,12 +25,6 @@
   let {
     // preferred single-text input (supports \n and blank lines)
     text: textRaw = "",
-
-    // existing fallbacks
-    p1 = "Text slider with",
-    p2 = "typing animation effect",
-    p3 = "in pure CSS.",
-    lines: linesJson = "",
 
     bgColor = "#ffcc00",
     cursorColor = "#000",
@@ -91,25 +81,9 @@
   }
 
   function buildSourceText() {
-    // 1) text prop wins
     if (textRaw && String(textRaw).trim().length) {
       return unescapeNewlines(textRaw);
     }
-
-    // 2) JSON lines text (IMPORTANT: keep empty strings for blank lines)
-    if (linesJson && String(linesJson).trim().length) {
-      try {
-        const parsed = JSON.parse(linesJson);
-        if (Array.isArray(parsed)) {
-          return parsed.map((l) => (l == null ? "" : String(l))).join("\n");
-        }
-      } catch {
-        // ignore
-      }
-    }
-
-    // 3) p1/p2/p3 fallback
-    return [p1, p2, p3].filter((l) => l && String(l).trim().length).join("\n");
   }
 
   let sourceText = $state(buildSourceText());
