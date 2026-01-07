@@ -177,7 +177,7 @@ Say we want to build `cool-component`:
 
 ### Reviewing a Pull Request
 - If you're reviewing someone else's PR, use the SHA they provide and double check that the component works in a Shorthand story.
-- If it does, hooray! Delete `dist/widgets.js` and approve the PR.
+- If it does, hooray! Delete `dist/widgets-dev.js` and approve the PR.
 
 ### Merge your PR and release an update
 Once your PR is approved, it's time to merge and update the library! 
