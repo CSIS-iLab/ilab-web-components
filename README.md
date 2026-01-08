@@ -58,7 +58,7 @@ The separation between `dev` and `lib` serves both to keep things clean and as a
 
 When a component is ready to be promoted from dev to production, it should be copied to `lib` and deleted from `dev`. Most frequently, `dev` components will stay in development branches and never be merged into `main`. 
 
-But, a `dev` component may end up on `main`: 
+`dev` is a directory that you create on your branch; it shouldn't be on `main`. BUT, a `dev` component may end up on `main`: 
 - By accident - we forget to check the `dev` directory when reviewing a PR, focusing only on what's going to prod
 - To experiment - we may want a component in `dev` to be made available for everyone to check out and iterate on/implement new features. 
 
