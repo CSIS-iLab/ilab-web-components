@@ -5,10 +5,23 @@
       leftTitle: { attribute: "left-title", type: "String" },
       bgImageLeft: { attribute: "bg-image-left", type: "String" },
       btnBgColorLeft: { attribute: "btn-bg-color-left", type: "String" },
+      btnHoverBgColorLeft: {
+        attribute: "btn-hover-bg-color-left",
+        type: "String",
+      },
       rightTitle: { attribute: "right-title", type: "String" },
       bgImageRight: { attribute: "bg-image-right", type: "String" },
       btnBgColorRight: { attribute: "btn-bg-color-right", type: "String" },
+      btnHoverBgColorRight: {
+        attribute: "btn-hover-bg-color-right",
+        type: "String",
+      },
 
+      btnBorderColor: { attribute: "btn-border-color", type: "String" },
+      btnHoverBorderColor: {
+        attribute: "btn-hover-border-color",
+        type: "String",
+      },
       btnText: { attribute: "btn-text", type: "String" },
     },
   }}
@@ -20,10 +33,15 @@
   let {
     bgImageLeft = "",
     leftTitle = "left title",
-    btnBgColorLeft = "",
+    btnBgColorLeft = "black",
+    btnHoverBgColorLeft = "gray",
     bgImageRight = "",
     rightTitle = "right title",
-    btnBgColorRight = "",
+    btnBgColorRight = "black",
+    btnHoverBgColorRight = "gray",
+
+    btnBorderColor = "red",
+    btnHoverBorderColor = "blue",
     btnText = "Read More",
   } = $props();
 
@@ -37,8 +55,12 @@
   style={`
     --bg-image-left: url("${bgImageLeft}");
     --btn-bg-color-left: ${btnBgColorLeft};
+    --btn-hover-bg-color-left: ${btnHoverBgColorLeft};
     --bg-image-right: url("${bgImageRight}");
     --btn-bg-color-right: ${btnBgColorRight};
+    --btn-hover-bg-color-right: ${btnHoverBgColorRight};
+    --btn-border-color: ${btnBorderColor};
+    --btn-hover-border-color: ${btnHoverBorderColor};
   `}
 >
   <!-- container will be defined once this renders -->
@@ -119,22 +141,22 @@
 
     .split.left .button {
       background-color: var(--btn-bg-color-left, --base-color);
-      border-color: var(--left-button-border-color);
+      border-color: var(--btn-border-color, --left-btn-border-color);
     }
 
     .split.right .button {
       background-color: var(--btn-bg-color-right, --base-color);
-      border-color: var(--right-button-border-color);
+      border-color: var(--btn-border-color, --right-btn-border-color);
     }
 
     .split.left .button:hover {
-      background-color: var(--left-button-hover-color);
-      border-color: var(--left-button-hover-color);
+      background-color: var(--btn-hover-bg-color-left);
+      border-color: var(--btn-hover-border-color, --left-button-hover-color);
     }
 
     .split.right .button:hover {
-      background-color: var(--right-button-hover-color);
-      border-color: var(--right-button-hover-color);
+      background-color: var(--btn-hover-bg-color-right);
+      border-color: var(--btn-hover-border-color, --right-button-hover-color);
     }
 
     .container {
