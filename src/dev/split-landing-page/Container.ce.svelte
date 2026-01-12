@@ -3,6 +3,8 @@
     tag: "csis-split-landing",
     props: {
       leftTitle: { attribute: "left-title", type: "String" },
+      btnLeftLink: { attribute: "btn-left-link", type: "String" },
+      leftTarget: { attribute: "left-target", type: "String" },
       bgImageLeft: { attribute: "bg-image-left", type: "String" },
       btnBgColorLeft: { attribute: "btn-bg-color-left", type: "String" },
       btnHoverBgColorLeft: {
@@ -10,6 +12,8 @@
         type: "String",
       },
       rightTitle: { attribute: "right-title", type: "String" },
+      btnRightLink: { attribute: "btn-right-link", type: "String" },
+      rightTarget: { attribute: "right-target", type: "String" },
       bgImageRight: { attribute: "bg-image-right", type: "String" },
       btnBgColorRight: { attribute: "btn-bg-color-right", type: "String" },
       btnHoverBgColorRight: {
@@ -33,10 +37,14 @@
   let {
     bgImageLeft = "",
     leftTitle = "left title",
+    btnLeftLink = "#top",
+    leftTarget = "_self",
     btnBgColorLeft = "black",
     btnHoverBgColorLeft = "gray",
     bgImageRight = "",
     rightTitle = "right title",
+    btnRightLink = "#top",
+    rightTarget = "_self",
     btnBgColorRight = "black",
     btnHoverBgColorRight = "gray",
 
@@ -64,8 +72,8 @@
   `}
 >
   <!-- container will be defined once this renders -->
-  <Left {container} {leftTitle} {btnText} />
-  <Right {container} {rightTitle} {btnText} />
+  <Left {container} {leftTitle} {btnText} {btnLeftLink} {leftTarget} />
+  <Right {container} {rightTitle} {btnText} {btnRightLink} {rightTarget} />
 </div>
 
 <style>

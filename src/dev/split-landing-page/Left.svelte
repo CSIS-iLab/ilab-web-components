@@ -1,5 +1,5 @@
 <script>
-  let { container, leftTitle, btnText } = $props();
+  let { container, leftTitle, btnText, btnLeftLink, leftTarget } = $props();
   let left;
 </script>
 
@@ -10,5 +10,5 @@
   on:mouseleave={() => container?.classList.remove("hover-left")}
 >
   <h1>{leftTitle}</h1>
-  <a href="#" class="button">{btnText}</a>
+  <a href={btnLeftLink} target={leftTarget} class="button">{btnText}</a>
 </div>
