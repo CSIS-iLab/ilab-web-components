@@ -9,25 +9,10 @@
 />
 
 <script>
-  import { onMount, onDestroy } from "svelte";
-
   let { textColor = "#fff", backgroundColor = "#242424" } = $props();
-
-  let footerEl;
-  let prevPadding = "";
-
-  onMount(() => {
-    prevPadding = document.body.style.paddingBottom;
-    document.body.style.paddingBottom = "0px";
-  });
-
-  onDestroy(() => {
-    document.body.style.paddingBottom = prevPadding;
-  });
 </script>
 
 <footer
-  bind:this={footerEl}
   class="footer"
   style={`--footer-bg: ${backgroundColor}; --footer-text: ${textColor};`}
 >
@@ -450,11 +435,6 @@
   :host {
     display: block;
     width: 100%;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
   }
 
   .footer {
@@ -462,11 +442,18 @@
     color: var(--footer-text);
     padding: 2.5rem 0 2rem 0;
     font-family: "Arial", sans-serif;
+
+    /* NEW: make this a full-height section */
+    min-height: min(100vh, 345.71px);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
   }
 
   .footer__grid {
     max-width: 1290px;
-    margin: 0 auto;
+    /* margin: 0 auto; */
+    margin: auto auto 0 auto; /* top:auto pushes grid to bottom */
     padding: 0;
 
     display: grid;
