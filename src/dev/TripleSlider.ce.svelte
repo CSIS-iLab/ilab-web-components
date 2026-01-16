@@ -151,18 +151,6 @@
     magVisible = false;
   }
 
-  onMount(() => {
-    measureStage();
-    ro = new ResizeObserver(measureStage);
-    if (container) ro.observe(container);
-    window.addEventListener("resize", measureStage);
-  });
-
-  onDestroy(() => {
-    ro?.disconnect();
-    window.removeEventListener("resize", measureStage);
-  });
-
   function sortSplits() {
     // Allow overlap (no minimum gap), but prevent crossing.
     split1 = clamp(split1, 0, 100);
@@ -307,6 +295,18 @@
       if (split1 > split2) split1 = split2;
     }
   }
+
+  onMount(() => {
+    measureStage();
+    ro = new ResizeObserver(measureStage);
+    if (container) ro.observe(container);
+    window.addEventListener("resize", measureStage);
+  });
+
+  onDestroy(() => {
+    ro?.disconnect();
+    window.removeEventListener("resize", measureStage);
+  });
 
   $effect(() => {
     sortSplits();
