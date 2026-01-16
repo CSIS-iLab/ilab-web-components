@@ -58,6 +58,9 @@
     magnifierBorderColor = "#fff",
   } = $props();
 
+  /* ------------------------------------------------------ */
+  /*                     Magnifier State                    */
+  /* ------------------------------------------------------ */
   // Whether the magnifier lens should be visible
   // (true when pointer is over the image, false otherwise)
   let magVisible = $state(false);
@@ -66,6 +69,9 @@
   let magX = $state(0);
   let magY = $state(0);
 
+  /* ------------------------------------------------------ */
+  /*                       Drag State                       */
+  /* ------------------------------------------------------ */
   // Reference to the main image stage element
   // Used for measuring size and converting pointer coordinates
   let container;
@@ -102,6 +108,9 @@
   // Determines which direction breaks the stack
   let stackWhich = $state(null); // "h1" | "h2" | null
 
+  /* ------------------------------------------------------ */
+  /*                  Constants and Helpers                 */
+  /* ------------------------------------------------------ */
   // Utility: clamp a value between min and max
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
@@ -116,6 +125,9 @@
   // Larger values make separation more intentional
   const STACK_BREAK = 1.0;
 
+  /* ------------------------------------------------------ */
+  /*             Measurement and Geometry Helpers            */
+  /* ------------------------------------------------------ */
   function measureStage() {
     const rect = container?.getBoundingClientRect();
     if (!rect) return;
@@ -123,6 +135,22 @@
     stageH = rect.height;
   }
 
+  function pctFromClientX(clientX) {
+    const rect = container?.getBoundingClientRect();
+    if (!rect) return 0;
+    const x = clamp(clientX - rect.left, 0, rect.width);
+    return (x / rect.width) * 100;
+  }
+
+  function sortSplits() {
+    // Allow overlap (no minimum gap), but prevent crossing.
+    split1 = clamp(split1, 0, 100);
+    split2 = clamp(split2, 0, 100);
+  }
+
+  /* ------------------------------------------------------ */
+  /*                     Magnifier Logic                    */
+  /* ------------------------------------------------------ */
   function updateMagnifierFromEvent(e) {
     if (!magnifier) return;
     if (!container) return;
@@ -151,19 +179,9 @@
     magVisible = false;
   }
 
-  function sortSplits() {
-    // Allow overlap (no minimum gap), but prevent crossing.
-    split1 = clamp(split1, 0, 100);
-    split2 = clamp(split2, 0, 100);
-  }
-
-  function pctFromClientX(clientX) {
-    const rect = container?.getBoundingClientRect();
-    if (!rect) return 0;
-    const x = clamp(clientX - rect.left, 0, rect.width);
-    return (x / rect.width) * 100;
-  }
-
+  /* ------------------------------------------------------ */
+  /*                Pointer/Keyboard Handlers               */
+  /* ------------------------------------------------------ */
   function onPointerDown(which, e) {
     activeHandle = which;
 
@@ -296,6 +314,9 @@
     }
   }
 
+  /* ------------------------------------------------------ */
+  /*                     Lifecycle Hooks                    */
+  /* ------------------------------------------------------ */
   onMount(() => {
     measureStage();
     ro = new ResizeObserver(measureStage);
@@ -308,6 +329,9 @@
     window.removeEventListener("resize", measureStage);
   });
 
+  /* ------------------------------------------------------ */
+  /*                    Reactive Effects                    */
+  /* ------------------------------------------------------ */
   $effect(() => {
     sortSplits();
   });
