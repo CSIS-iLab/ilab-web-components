@@ -31,6 +31,8 @@
 />
 
 <script>
+  import { onMount, onDestroy } from "svelte";
+
   let {
     // image defaults
     imgA = "",
@@ -56,18 +58,63 @@
     magnifierBorderColor = "#fff",
   } = $props();
 
-  import { onMount, onDestroy } from "svelte";
-
+  // Whether the magnifier lens should be visible
+  // (true when pointer is over the image, false otherwise)
   let magVisible = $state(false);
-  let magX = $state(0); // px within stage
+
+  // Current magnifier center position (pixels relative to the stage)
+  let magX = $state(0);
   let magY = $state(0);
 
+  // Reference to the main image stage element
+  // Used for measuring size and converting pointer coordinates
+  let container;
+  // Cached dimensions of the image stage (in pixels)
+  // Used to scale and position the magnified image correctly
   let stageW = $state(0);
   let stageH = $state(0);
 
+  // ResizeObserver instance for watching stage size changes
+  // (stored so we can disconnect it on destroy)
   let ro;
 
+  // Helper: radius of the magnifier lens (half its diameter)
+  // Used to keep the lens fully inside the image bounds
   const magR = () => magnifierSize / 2;
+
+  // Which handle is currently active (for drag + keyboard support)
+  // "h1" = left handle, "h2" = right handle, null = none
+  let activeHandle = $state(null);
+
+  // Current drag behavior mode:
+  // - "h1": dragging left handle
+  // - "h2": dragging right handle
+  // - "stack": handles are stacked and moving together
+  // - null: no active drag
+  let dragMode = $state(null);
+
+  // When handles are stacked, this stores the percent position
+  // where they met, so we know when the user has dragged far
+  // enough to separate them again
+  let stackAnchor = $state(null); // number | null (percentage)
+
+  // Remembers which handle the user grabbed while stacked
+  // Determines which direction breaks the stack
+  let stackWhich = $state(null); // "h1" | "h2" | null
+
+  // Utility: clamp a value between min and max
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+  // How close (in percent) the handles must be to count as "stacked"
+  // Helps avoid jitter from tiny floating-point differences
+  const STACK_EPSILON = 0.5;
+
+  // Returns true if the two handles are currently stacked
+  const isStacked = () => Math.abs(split2 - split1) <= STACK_EPSILON;
+
+  // How far (in percent) the user must drag to separate stacked handles
+  // Larger values make separation more intentional
+  const STACK_BREAK = 1.0;
 
   function measureStage() {
     const rect = container?.getBoundingClientRect();
@@ -115,21 +162,6 @@
     ro?.disconnect();
     window.removeEventListener("resize", measureStage);
   });
-
-  let container;
-  let activeHandle = $state(null); // "h1" | "h2" | null
-
-  let dragMode = $state(null); // "h1" | "h2" | "stack" | nul
-
-  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
-
-  const STACK_EPSILON = 0.5; // percent; tweak if you want
-  const isStacked = () => Math.abs(split2 - split1) <= STACK_EPSILON;
-
-  const STACK_BREAK = 1.0; // percent needed to "pull apart" when stacked
-
-  let stackAnchor = $state(null); // number | null (pct)
-  let stackWhich = $state(null); // "h1" | "h2" | null
 
   function sortSplits() {
     // Allow overlap (no minimum gap), but prevent crossing.
