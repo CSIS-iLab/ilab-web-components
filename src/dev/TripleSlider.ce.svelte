@@ -2,17 +2,20 @@
   customElement={{
     tag: "csis-triple-compare",
     props: {
+      // images
       imgA: { attribute: "img-a", type: "String" },
       imgB: { attribute: "img-b", type: "String" },
       imgC: { attribute: "img-c", type: "String" },
+      // labels
       labelA: { attribute: "label-a", type: "String" },
       labelB: { attribute: "label-b", type: "String" },
       labelC: { attribute: "label-c", type: "String" },
+      labelFontSize: { attribute: "label-font-size", type: "String" },
+      // show/hide top labels
+      showLabels: { attribute: "show-labels", type: "Boolean" },
       // initial handle positions in percent (0–100)
       split1: { attribute: "split-1", type: "Number" },
       split2: { attribute: "split-2", type: "Number" },
-      // show/hide top labels
-      showLabels: { attribute: "show-labels", type: "Boolean" },
       // optional aspect ratio like "16/9" or "4/3"
       aspect: { attribute: "aspect", type: "String" },
       // magnifier options
@@ -23,28 +26,34 @@
         attribute: "magnifier-border-color",
         type: "String",
       },
-      labelFontSize: { attribute: "label-font-size", type: "String" },
     },
   }}
 />
 
 <script>
   let {
+    // image defaults
     imgA = "",
     imgB = "",
     imgC = "",
+    // label defaults
     labelA = "A",
     labelB = "B",
     labelC = "C",
+    labelFontSize = "12px",
+    // label default is off
+    showLabels = false,
+    // default splits
     split1 = 33.333,
     split2 = 66.666,
-    showLabels = false,
+    // default aspect ratio
     aspect = "16/9",
+    // magnifier default is off
     magnifier = false,
+    // default magnifier settings
     magnifierZoom = 2,
     magnifierSize = 150,
     magnifierBorderColor = "#fff",
-    labelFontSize="12px"
   } = $props();
 
   import { onMount, onDestroy } from "svelte";
@@ -465,8 +474,7 @@
     align-items: center;
     padding: 0 10px;
     font:
-      600 var(--label-font-size, 12px) / 1
-      -apple-system,
+      600 var(--label-font-size, 12px) / 1 -apple-system,
       Segoe UI,
       Roboto,
       Helvetica,
