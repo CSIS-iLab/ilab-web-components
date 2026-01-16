@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-
   <head>
     <meta charset="UTF-8" />
     <title>Testing</title>
@@ -37,28 +36,33 @@
       </p>
     </main>
 
-    <csis-triple-compare
-      img-a="https://res.cloudinary.com/csisideaslab/image/upload/v1768337641/hidden-reach/image1.png"
-      img-b="https://res.cloudinary.com/csisideaslab/image/upload/v1768337638/hidden-reach/image2.png"
-      img-c="https://res.cloudinary.com/csisideaslab/image/upload/v1768337636/hidden-reach/image3.png"
-      split-1="33" 
-      split-2="66" 
-      aspect="16/9" 
-      show-labels
-      magnifier
-      label-font-size="24px"
-      ></csis-triple-compare>
-
+    <csis-split-landing
+      left-title="Lorem impsum bla bla bla"
+      btn-left-link="https://duckduckgo.com"
+      left-target="_blank"
+      bg-image-left="https://res.cloudinary.com/csisideaslab/image/upload/v1759435607/dev-team/annie-spratt-4CKAvwj0nok-unsplash-EDIT-EDIT.jpg"
+      right-title="right"
+      btn-right-link="https://github.com"
+      btn-bg-color-left="blue"
+      btn-hover-bg-color-left="brown"
+      bg-image-right="https://res.cloudinary.com/csisideaslab/image/upload/v1759435601/dev-team/annie-spratt-4CKAvwj0nok-unsplash-EDIT.jpg"
+      btn-border-color="black"
+      btn-hover-border-color="green"
+      btn-text="Some text..."
+    ></csis-split-landing>
     <csis-text-typing
       text="A new space race is underway.\n\nCountries everywhere want in.\n\nBut they need partners who can get them there."
       bg-color="#222"
       font-url="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap"
-      font-family="'Orbitron', system-ui, sans-serif" font-size="2rem"
-      font-color="#80E4F6" cursor-color="#80E4F6" animation-duration="12s"
-      min-height="100vh"></csis-text-typing>
+      font-family="'Orbitron', system-ui, sans-serif"
+      font-size="2rem"
+      font-color="#80E4F6"
+      cursor-color="#80E4F6"
+      animation-duration="12s"
+      min-height="100vh"
+    ></csis-text-typing>
 
     <csis-magnifier magnifier-border-color="#fff"></csis-magnifier>
     <csis-hidden-reach-footer></csis-hidden-reach-footer>
   </body>
-
 </html>
