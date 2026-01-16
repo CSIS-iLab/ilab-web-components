@@ -23,6 +23,7 @@
         attribute: "magnifier-border-color",
         type: "String",
       },
+      labelFontSize: { attribute: "label-font-size", type: "String" },
     },
   }}
 />
@@ -43,6 +44,7 @@
     magnifierZoom = 2,
     magnifierSize = 150,
     magnifierBorderColor = "#fff",
+    labelFontSize="12px"
   } = $props();
 
   import { onMount, onDestroy } from "svelte";
@@ -272,7 +274,7 @@
 
 <div
   class="wrap"
-  style={`--split1:${split1}%; --split2:${split2}%; --aspect:${aspect};`}
+  style={`--split1:${split1}%; --split2:${split2}%; --aspect:${aspect}; --label-font-size:${labelFontSize}`}
 >
   <div
     class="stage"
@@ -463,7 +465,7 @@
     align-items: center;
     padding: 0 10px;
     font:
-      600 12px/1 system-ui,
+      600 var(--label-font-size, 12px) / 1
       -apple-system,
       Segoe UI,
       Roboto,
