@@ -409,6 +409,8 @@
       --mag-img-h:${stageH * magnifierZoom}px;
       --mag-off-x:${-(magX * magnifierZoom - magnifierSize / 2)}px;
       --mag-off-y:${-(magY * magnifierZoom - magnifierSize / 2)}px;
+      --mag-div1-x:${(split1 / 100) * (stageW * magnifierZoom) + -(magX * magnifierZoom - magnifierSize / 2)}px;
+      --mag-div2-x:${(split2 / 100) * (stageW * magnifierZoom) + -(magX * magnifierZoom - magnifierSize / 2)}px;
     `}
         aria-hidden="true"
       >
@@ -435,6 +437,18 @@
             />
           {/if}
         </div>
+        <div
+          class="mag-divider"
+          style={`left: var(--mag-div1-x);`}
+          aria-hidden="true"
+        ></div>
+        {#if !isStacked()}
+          <div
+            class="mag-divider"
+            style={`left: var(--mag-div2-x);`}
+            aria-hidden="true"
+          ></div>
+        {/if}
       </div>
     {/if}
 
@@ -654,5 +668,17 @@
     object-fit: cover;
     display: block;
     user-select: none;
+  }
+
+  .mag-divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 30; /* above magnified imagery */
   }
 </style>
