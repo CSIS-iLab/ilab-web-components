@@ -43,6 +43,11 @@
   const STACK_EPSILON = 0.5; // percent; tweak if you want
   const isStacked = () => Math.abs(split2 - split1) <= STACK_EPSILON;
 
+  const STACK_BREAK = 1.0; // percent needed to "pull apart" when stacked
+
+  let stackAnchor = $state(null); // number | null (pct)
+  let stackWhich = $state(null); // "h1" | "h2" | null
+
   function sortSplits() {
     // Allow overlap (no minimum gap), but prevent crossing.
     split1 = clamp(split1, 0, 100);
@@ -59,8 +64,17 @@
   function onPointerDown(which, e) {
     activeHandle = which;
 
-    // If they’re stacked, grabbing either knob should drag both together.
-    dragMode = isStacked() ? "stack" : which;
+    const stacked = isStacked();
+
+    if (stacked) {
+      dragMode = "stack";
+      stackAnchor = (split1 + split2) / 2; // where they’re stacked
+      stackWhich = which; // remember which knob they grabbed
+    } else {
+      dragMode = which;
+      stackAnchor = null;
+      stackWhich = null;
+    }
 
     e.currentTarget.setPointerCapture?.(e.pointerId);
     e.preventDefault();
@@ -72,6 +86,34 @@
     const p = pctFromClientX(e.clientX);
 
     if (dragMode === "stack") {
+      // If they pull outward far enough, break the stack.
+      // - Grabbed h1: pulling LEFT separates
+      // - Grabbed h2: pulling RIGHT separates
+      if (
+        stackAnchor != null &&
+        stackWhich === "h1" &&
+        p < stackAnchor - STACK_BREAK
+      ) {
+        dragMode = "h1";
+        split2 = stackAnchor; // keep the other handle at the anchor
+        split1 = p;
+        sortSplits();
+        return;
+      }
+
+      if (
+        stackAnchor != null &&
+        stackWhich === "h2" &&
+        p > stackAnchor + STACK_BREAK
+      ) {
+        dragMode = "h2";
+        split1 = stackAnchor;
+        split2 = p;
+        sortSplits();
+        return;
+      }
+
+      // Otherwise, keep dragging both together
       split1 = p;
       split2 = p;
       sortSplits();
@@ -102,7 +144,10 @@
   function onPointerUp() {
     activeHandle = null;
     dragMode = null;
+    stackAnchor = null;
+    stackWhich = null;
   }
+
   function onKeyDown(which, e) {
     const step = e.shiftKey ? 5 : 1; // shift = bigger move
     if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
