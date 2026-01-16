@@ -185,6 +185,8 @@
   function onPointerDown(which, e) {
     activeHandle = which;
 
+    e.currentTarget.focus();
+
     const stacked = isStacked();
 
     if (stacked) {
