@@ -15,6 +15,14 @@
       showLabels: { attribute: "show-labels", type: "Boolean" },
       // optional aspect ratio like "16/9" or "4/3"
       aspect: { attribute: "aspect", type: "String" },
+      // magnifier options
+      magnifier: { attribute: "magnifier", type: "Boolean" },
+      magnifierZoom: { attribute: "magnifier-zoom", type: "Number" },
+      magnifierSize: { attribute: "magnifier-size", type: "Number" }, //px
+      magnifierBorderColor: {
+        attribute: "magnifier-border-color",
+        type: "String",
+      },
     },
   }}
 />
@@ -29,9 +37,73 @@
     labelC = "C",
     split1 = 33.333,
     split2 = 66.666,
-    showLabels = true,
+    showLabels = false,
     aspect = "16/9",
+    magnifier = false,
+    magnifierZoom = 2,
+    magnifierSize = 150,
+    magnifierBorderColor = "#fff",
   } = $props();
+
+  import { onMount, onDestroy } from "svelte";
+
+  let magVisible = $state(false);
+  let magX = $state(0); // px within stage
+  let magY = $state(0);
+
+  let stageW = $state(0);
+  let stageH = $state(0);
+
+  let ro;
+
+  const magR = () => magnifierSize / 2;
+
+  function measureStage() {
+    const rect = container?.getBoundingClientRect();
+    if (!rect) return;
+    stageW = rect.width;
+    stageH = rect.height;
+  }
+
+  function updateMagnifierFromEvent(e) {
+    if (!magnifier) return;
+    if (!container) return;
+
+    // Optional UX: hide magnifier while actively dragging handles
+    if (dragMode) {
+      magVisible = false;
+      return;
+    }
+
+    const rect = container.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    // clamp so lens stays fully inside stage
+    const r = magR();
+    x = clamp(x, r, rect.width - r);
+    y = clamp(y, r, rect.height - r);
+
+    magX = x;
+    magY = y;
+    magVisible = true;
+  }
+
+  function hideMagnifier() {
+    magVisible = false;
+  }
+
+  onMount(() => {
+    measureStage();
+    ro = new ResizeObserver(measureStage);
+    if (container) ro.observe(container);
+    window.addEventListener("resize", measureStage);
+  });
+
+  onDestroy(() => {
+    ro?.disconnect();
+    window.removeEventListener("resize", measureStage);
+  });
 
   let container;
   let activeHandle = $state(null); // "h1" | "h2" | null
@@ -81,6 +153,9 @@
   }
 
   function onPointerMove(e) {
+    // Always track the magnifier when enabled
+    updateMagnifierFromEvent(e);
+
     if (!dragMode) return;
 
     const p = pctFromClientX(e.clientX);
@@ -146,6 +221,7 @@
     dragMode = null;
     stackAnchor = null;
     stackWhich = null;
+    // show again after drag ends (next move will re-show)
   }
 
   function onKeyDown(which, e) {
@@ -205,7 +281,11 @@
     onpointermove={onPointerMove}
     onpointerup={onPointerUp}
     onpointercancel={onPointerUp}
-    onpointerleave={onPointerUp}
+    onpointerleave={() => {
+      onPointerUp();
+      hideMagnifier();
+    }}
+    onpointerenter={updateMagnifierFromEvent}
   >
     <!-- Base layer -->
     <div class="layer layer-a">
@@ -247,6 +327,47 @@
         </div>
       </div>
     {/if}
+    {#if magnifier && magVisible}
+      <div
+        class="magnifier"
+        style={`
+      --mag-size:${magnifierSize}px;
+      --mag-border:${magnifierBorderColor};
+      --mag-left:${magX}px;
+      --mag-top:${magY}px;
+      --mag-img-w:${stageW * magnifierZoom}px;
+      --mag-img-h:${stageH * magnifierZoom}px;
+      --mag-off-x:${-(magX * magnifierZoom - magnifierSize / 2)}px;
+      --mag-off-y:${-(magY * magnifierZoom - magnifierSize / 2)}px;
+    `}
+        aria-hidden="true"
+      >
+        <div class="magnifier__inner">
+          {#if imgA}
+            <img class="mag-layer mag-a" src={imgA} alt="" />
+          {/if}
+
+          {#if imgB}
+            <img
+              class="mag-layer mag-b"
+              src={imgB}
+              alt=""
+              style={`clip-path: inset(0 0 0 var(--split1));`}
+            />
+          {/if}
+
+          {#if imgC}
+            <img
+              class="mag-layer mag-c"
+              src={imgC}
+              alt=""
+              style={`clip-path: inset(0 0 0 var(--split2));`}
+            />
+          {/if}
+        </div>
+      </div>
+    {/if}
+
     <!-- {#if isStacked()}
       <button
         class="stack-catcher"
@@ -435,4 +556,39 @@
     z-index: 9; 
     cursor: ew-resize;
   } */
+
+  /* ------------------------------------------------------ */
+  /*                        Magnifier                       */
+  /* ------------------------------------------------------ */
+  .magnifier {
+    position: absolute;
+    left: var(--mag-left);
+    top: var(--mag-top);
+    width: var(--mag-size);
+    height: var(--mag-size);
+    transform: translate(-50%, -50%);
+    border: 3px solid var(--mag-border);
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 20;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .magnifier__inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .mag-layer {
+    position: absolute;
+    left: var(--mag-off-x);
+    top: var(--mag-off-y);
+    width: var(--mag-img-w);
+    height: var(--mag-img-h);
+    object-fit: cover;
+    display: block;
+    user-select: none;
+  }
 </style>
