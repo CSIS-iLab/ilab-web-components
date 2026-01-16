@@ -302,7 +302,6 @@
     aspect-ratio: var(--aspect);
     background: #111;
     overflow: hidden;
-    border-radius: 12px;
     user-select: none;
     touch-action: none; /* we’re doing our own pointer handling */
   }
