@@ -478,6 +478,7 @@
     width: 100%;
     height: 411px;
     border-radius: var(--ab-border-radius, 20px);
+    overflow: hidden;
   }
 
   @media (min-width: 900px) {
@@ -580,7 +581,8 @@
     display: none;
     position: absolute;
     right: 0;
-    top: -4px;
+    /* top: -4px; */
+    bottom: calc(100% + 8px);
     background: var(--ab-menu-bg, #f9f9f9);
     color: var(--ab-menu-fg, #111);
     min-width: 180px;
