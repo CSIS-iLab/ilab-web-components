@@ -35,13 +35,13 @@
 
   let {
     // image defaults
-    imgA = "",
-    imgB = "",
-    imgC = "",
+    imgA = "https://res.cloudinary.com/csisideaslab/image/upload/v1704817682/dev-team/Screenshot_2024-01-09_at_11.26.36_AM.png",
+    imgB = "https://res.cloudinary.com/csisideaslab/image/upload/v1704817683/dev-team/Screenshot_2024-01-09_at_11.25.01_AM.png",
+    imgC = "https://res.cloudinary.com/csisideaslab/image/upload/v1770316926/dev-team/ilze-EU-F188r1Ig-unsplash.jpg",
     // label defaults
-    labelA = "A",
-    labelB = "B",
-    labelC = "C",
+    labelA = "Waffles",
+    labelB = "Wallace and Wobbles",
+    labelC = "Fluffy Cat",
     labelFontSize = "12px",
     // label default is off
     showLabels = false,
@@ -380,20 +380,20 @@
 
     {#if showLabels}
       <div class="labels" aria-hidden="true">
-        <div class="label label-a" style={`width: var(--split1);`}>
-          {labelA}
+        <div class="label-slot label-a" style={`left: 0%; width: var(--split1);`}>
+          <div class="label">{labelA}</div>
         </div>
         <div
-          class="label label-b"
+          class="label-slot label-b"
           style={`left: var(--split1); width: calc(var(--split2) - var(--split1));`}
         >
-          {labelB}
+          <div class="label">{labelB}</div>
         </div>
         <div
-          class="label label-c"
+          class="label-slot label-c"
           style={`left: var(--split2); width: calc(100% - var(--split2));`}
         >
-          {labelC}
+          <div class="label">{labelC}</div>
         </div>
       </div>
     {/if}
@@ -451,16 +451,6 @@
         {/if}
       </div>
     {/if}
-
-    <!-- {#if isStacked()}
-      <button
-        class="stack-catcher"
-        style={`left: var(--split1);`}
-        aria-label="Drag stacked divider"
-        onpointerdown={onStackPointerDown}
-        type="button"
-      ></button>
-    {/if} -->
 
     <!-- Handle 1 -->
     <button
@@ -540,36 +530,49 @@
     left: 10px;
     right: 10px;
     height: 34px;
-    display: block;
+    /* display: block; */
     pointer-events: none;
     z-index: 5;
+    overflow: hidden;
   }
+  
+.label-slot {
+  position: absolute;
+  top: 0;
+  height: 34px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.label-slot.label-a { justify-content: flex-start; }
+.label-slot.label-b { justify-content: flex-start; padding: 0 20px; }
+.label-slot.label-c { justify-content: flex-start; padding: 0 24px;}
+
 
   .label {
-    position: absolute;
-    top: 0;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    font:
-      600 var(--label-font-size, 12px) / 1 -apple-system,
-      Segoe UI,
-      Roboto,
-      Helvetica,
-      Arial,
-      sans-serif;
-    letter-spacing: 0.02em;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 999px;
-    backdrop-filter: blur(6px);
-    max-width: 60%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  /* remove: position:absolute; top:0; */
+
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 10px;
+
+  font: 600 var(--label-font-size, 12px) / 1 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
   /* ------------------------------------------------------ */
   /*                         Handles                        */
