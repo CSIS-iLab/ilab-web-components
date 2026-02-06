@@ -436,7 +436,7 @@
             Playback Speed
           </button>
 
-          <!-- {#if speedOpen} --> {:else}
+          {:else}
             <div class="submenu" style="padding:6px 6px 10px">
               <button
                 class="item"
