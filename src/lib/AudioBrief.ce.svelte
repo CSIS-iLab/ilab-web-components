@@ -581,7 +581,6 @@
     display: none;
     position: absolute;
     right: 0;
-    /* top: -4px; */
     bottom: calc(100% + 8px);
     background: var(--ab-menu-bg, #f9f9f9);
     color: var(--ab-menu-fg, #111);
