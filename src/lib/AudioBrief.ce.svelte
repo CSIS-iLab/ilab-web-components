@@ -159,6 +159,8 @@
   let menuOpen = $state(false);
   let speedOpen = $state(false);
   let playbackRate = $state(1);
+  let menuEl;
+  let menuBtnEl;
 
   const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -260,20 +262,23 @@
 
   // Close menus on outside clicks — attach and clean up properly
   $effect(() => {
-    function onDocClick(e) {
-      // if click is outside this custom element, close menus
-      const root =
-        (typeof getRootNode === "function" && getRootNode()) || document;
-      const host = root.host || null;
-      const path = e.composedPath ? e.composedPath() : [e.target];
-      if (host && !path.includes(host)) {
-        menuOpen = false;
-        speedOpen = false;
-      }
+  function onDocPointerDown(e) {
+    if (!menuOpen) return;
+
+    const path = e.composedPath?.() ?? [];
+    const inMenu = menuEl && path.includes(menuEl);
+    const inBtn = menuBtnEl && path.includes(menuBtnEl);
+
+    if (!inMenu && !inBtn) {
+      menuOpen = false;
+      speedOpen = false;
     }
-    document.addEventListener("click", onDocClick);
-    return () => document.removeEventListener("click", onDocClick);
-  });
+  }
+
+  document.addEventListener("pointerdown", onDocPointerDown, true);
+  return () =>
+    document.removeEventListener("pointerdown", onDocPointerDown, true);
+});
 </script>
 
 <div class="player">
@@ -356,11 +361,14 @@
             menuOpen = !menuOpen;
             speedOpen = false;
           }}
+          bind:this={menuBtnEl}
         >
           <img class="icon-img" alt="Menu" src={iconMenu} />
         </button>
 
-        <div class="menu" class:open={menuOpen} role="menu">
+        <div class="menu" bind:this={menuEl} class:open={menuOpen} role="menu">
+          {#if !speedOpen}
+          <!--download button-->
           <button
             class="item"
             role="menuitem"
@@ -396,6 +404,7 @@
             </button>
           {/if}
 
+          <!--share button-->
           <button
             class="item"
             role="menuitem"
@@ -415,6 +424,7 @@
             Share Audio
           </button>
 
+          <!--speed button-->
           <button
             class="item"
             role="menuitem"
@@ -426,7 +436,7 @@
             Playback Speed
           </button>
 
-          {#if speedOpen}
+          {:else}
             <div class="submenu" style="padding:6px 6px 10px">
               <button
                 class="item"
@@ -468,6 +478,7 @@
     width: 100%;
     height: 411px;
     border-radius: var(--ab-border-radius, 20px);
+    overflow: hidden;
   }
 
   @media (min-width: 900px) {
@@ -570,7 +581,7 @@
     display: none;
     position: absolute;
     right: 0;
-    top: -4px;
+    bottom: calc(100% + 8px);
     background: var(--ab-menu-bg, #f9f9f9);
     color: var(--ab-menu-fg, #111);
     min-width: 180px;
