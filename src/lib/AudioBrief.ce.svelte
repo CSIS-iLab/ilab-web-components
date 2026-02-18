@@ -78,7 +78,7 @@
     iconSkipForward = "https://res.cloudinary.com/csisideaslab/image/upload/v1706201954/Shorthand/Global%20Forecast/forward.svg",
     iconSkipStart = "https://res.cloudinary.com/csisideaslab/image/upload/v1706117793/Shorthand/Global%20Forecast/backward-3-svgrepo-com.svg",
     iconSkipEnd = "https://res.cloudinary.com/csisideaslab/image/upload/v1706117789/Shorthand/Global%20Forecast/forward-3-svgrepo-com.svg",
-    iconMenu = "https://res.cloudinary.com/csisideaslab/image/upload/v1706120568/Shorthand/Global%20Forecast/kebab-menu-svgrepo-com.svg",
+    iconMenu = "https://res.cloudinary.com/csisideaslab/image/upload/v1771450639/Shorthand/Global%20Forecast/kebab-menu.svg",
     iconDownload = "https://res.cloudinary.com/csisideaslab/image/upload/v1706148613/Shorthand/Global%20Forecast/download-svgrepo-com.svg",
     iconShare = "https://res.cloudinary.com/csisideaslab/image/upload/v1706148595/Shorthand/Global%20Forecast/share-alt-svgrepo-com.svg",
     iconBack = "https://res.cloudinary.com/csisideaslab/image/upload/v1706148618/Shorthand/Global%20Forecast/left-arrow-svgrepo-com.svg",
