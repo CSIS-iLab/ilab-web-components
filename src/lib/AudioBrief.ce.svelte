@@ -286,35 +286,35 @@
       }
     }
 
-    $effect(() => {
-      // border radius
-      setHostVar("--ab-border-radius", borderRadius);
-
-      // theme colors
-      setHostVar("--ab-text", textColor);
-      setHostVar("--ab-surface", surface);
-      setHostVar("--ab-accent", accent);
-      setHostVar("--ab-title-size", titleSize);
-
-      // progress
-      setHostVar("--ab-progress-bg", progressBg);
-      setHostVar("--ab-progress-fill", progressFill);
-
-      // menu
-      setHostVar("--ab-menu-bg", menuBg);
-      setHostVar("--ab-menu-fg", menuFg);
-      setHostVar("--ab-menu-hover-bg", menuHoverBg);
-      setHostVar("--ab-menu-hover-fg", menuHoverFg);
-
-      // icon filters
-      setHostVar("--ab-icon-filter", iconFilter);
-      setHostVar("--ab-menu-icon-filter", menuIconFilter);
-      setHostVar("--ab-menu-icon-hover-filter", menuIconHoverFilter);
-    });
-
     document.addEventListener("pointerdown", onDocPointerDown, true);
     return () =>
       document.removeEventListener("pointerdown", onDocPointerDown, true);
+  });
+
+  $effect(() => {
+    // border radius
+    setHostVar("--ab-border-radius", borderRadius);
+
+    // theme colors
+    setHostVar("--ab-text", textColor);
+    setHostVar("--ab-surface", surface);
+    setHostVar("--ab-accent", accent);
+    setHostVar("--ab-title-size", titleSize);
+
+    // progress
+    setHostVar("--ab-progress-bg", progressBg);
+    setHostVar("--ab-progress-fill", progressFill);
+
+    // menu
+    setHostVar("--ab-menu-bg", menuBg);
+    setHostVar("--ab-menu-fg", menuFg);
+    setHostVar("--ab-menu-hover-bg", menuHoverBg);
+    setHostVar("--ab-menu-hover-fg", menuHoverFg);
+
+    // icon filters
+    setHostVar("--ab-icon-filter", iconFilter);
+    setHostVar("--ab-menu-icon-filter", menuIconFilter);
+    setHostVar("--ab-menu-icon-hover-filter", menuIconHoverFilter);
   });
 </script>
 
