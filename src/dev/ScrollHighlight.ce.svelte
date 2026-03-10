@@ -105,6 +105,10 @@
     triggers = [];
   }
 
+  function getSlotElement() {
+    return rootEl?.getRootNode()?.querySelector("slot") ?? null;
+  }
+
   function getAssignedRoots(slot) {
     if (!slot) return [];
     return slot.assignedElements({ flatten: true });
@@ -198,6 +202,7 @@
   function setInactiveStyles(el) {
     el.style.backgroundRepeat = "no-repeat";
     el.style.backgroundImage = getBackgroundImage();
+    el.style.backgroundColor = "transparent";
     el.style.backgroundSize = "0% 100%";
     el.style.transition = [
       `color calc(${duration} / 4) cubic-bezier(0.25, 1, 0.5, 1)`,
@@ -254,20 +259,24 @@
   onMount(() => {
     setupFont();
 
-    const slot = rootEl?.shadowRoot?.querySelector("slot");
+    const slot = getSlotElement();
 
     requestAnimationFrame(() => {
       enhanceHighlights(slot);
     });
 
-    handleResize = () => enhanceHighlights(slot);
+    handleResize = () => {
+      const slot = getSlotElement();
+      enhanceHighlights(slot);
+    };
+
     window.addEventListener("resize", handleResize);
   });
 
   $: if (rootEl) {
     setupFont();
 
-    const slot = rootEl?.shadowRoot?.querySelector("slot");
+    const slot = getSlotElement();
 
     requestAnimationFrame(() => {
       enhanceHighlights(slot);
