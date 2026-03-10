@@ -30,23 +30,26 @@
       iconSpeed: { attribute: "icon-speed", type: "String" },
 
       /* Styles */
-      borderRadius:  { attribute: "border-radius",  type: "String" }, // -> --ab-border-radius
-      textColor:     { attribute: "text",           type: "String" }, // -> --ab-text
-      surface:       { attribute: "surface",        type: "String" }, // -> --ab-surface
-      accent:        { attribute: "accent",         type: "String" }, // -> --ab-accent
-      titleSize:     { attribute: "title-size",     type: "String" }, // -> --ab-title-size
+      borderRadius: { attribute: "border-radius", type: "String" }, // -> --ab-border-radius
+      textColor: { attribute: "text", type: "String" }, // -> --ab-text
+      surface: { attribute: "surface", type: "String" }, // -> --ab-surface
+      accent: { attribute: "accent", type: "String" }, // -> --ab-accent
+      titleSize: { attribute: "title-size", type: "String" }, // -> --ab-title-size
 
-      progressBg:    { attribute: "progress-bg",    type: "String" }, // -> --ab-progress-bg
-      progressFill:  { attribute: "progress-fill",  type: "String" }, // -> --ab-progress-fill
+      progressBg: { attribute: "progress-bg", type: "String" }, // -> --ab-progress-bg
+      progressFill: { attribute: "progress-fill", type: "String" }, // -> --ab-progress-fill
 
-      menuBg:        { attribute: "menu-bg",        type: "String" }, // -> --ab-menu-bg
-      menuFg:        { attribute: "menu-fg",        type: "String" }, // -> --ab-menu-fg
-      menuHoverBg:   { attribute: "menu-hover-bg",  type: "String" }, // -> --ab-menu-hover-bg
-      menuHoverFg:   { attribute: "menu-hover-fg",  type: "String" }, // -> --ab-menu-hover-fg
+      menuBg: { attribute: "menu-bg", type: "String" }, // -> --ab-menu-bg
+      menuFg: { attribute: "menu-fg", type: "String" }, // -> --ab-menu-fg
+      menuHoverBg: { attribute: "menu-hover-bg", type: "String" }, // -> --ab-menu-hover-bg
+      menuHoverFg: { attribute: "menu-hover-fg", type: "String" }, // -> --ab-menu-hover-fg
 
-      iconFilter:         { attribute: "icon-filter",          type: "String" }, // -> --ab-icon-filter
-      menuIconFilter:     { attribute: "menu-icon-filter",     type: "String" }, // -> --ab-menu-icon-filter
-      menuIconHoverFilter:{ attribute: "menu-icon-hover-filter", type: "String" }, // -> --ab-menu-icon-hover-filter
+      iconFilter: { attribute: "icon-filter", type: "String" }, // -> --ab-icon-filter
+      menuIconFilter: { attribute: "menu-icon-filter", type: "String" }, // -> --ab-menu-icon-filter
+      menuIconHoverFilter: {
+        attribute: "menu-icon-hover-filter",
+        type: "String",
+      }, // -> --ab-menu-icon-hover-filter
     },
   }}
 />
@@ -60,10 +63,9 @@
     transcriptSrc = "",
     bgImage = "",
     backgroundImageAlt = "",
- 
+
     /* theme fallback color when image absent (also sits under the image) */
     bgColor = "#050f27",
-
 
     /* fonts */
     fontUrl = "",
@@ -76,7 +78,7 @@
     iconSkipForward = "https://res.cloudinary.com/csisideaslab/image/upload/v1706201954/Shorthand/Global%20Forecast/forward.svg",
     iconSkipStart = "https://res.cloudinary.com/csisideaslab/image/upload/v1706117793/Shorthand/Global%20Forecast/backward-3-svgrepo-com.svg",
     iconSkipEnd = "https://res.cloudinary.com/csisideaslab/image/upload/v1706117789/Shorthand/Global%20Forecast/forward-3-svgrepo-com.svg",
-    iconMenu = "https://res.cloudinary.com/csisideaslab/image/upload/v1706120568/Shorthand/Global%20Forecast/kebab-menu-svgrepo-com.svg",
+    iconMenu = "https://res.cloudinary.com/csisideaslab/image/upload/v1771450639/Shorthand/Global%20Forecast/kebab-menu.svg",
     iconDownload = "https://res.cloudinary.com/csisideaslab/image/upload/v1706148613/Shorthand/Global%20Forecast/download-svgrepo-com.svg",
     iconShare = "https://res.cloudinary.com/csisideaslab/image/upload/v1706148595/Shorthand/Global%20Forecast/share-alt-svgrepo-com.svg",
     iconBack = "https://res.cloudinary.com/csisideaslab/image/upload/v1706148618/Shorthand/Global%20Forecast/left-arrow-svgrepo-com.svg",
@@ -119,7 +121,7 @@
     // Preconnects (once)
     if (
       !target.querySelector(
-        'link[rel="preconnect"][href="https://fonts.googleapis.com"]'
+        'link[rel="preconnect"][href="https://fonts.googleapis.com"]',
       )
     ) {
       const pc1 = document.createElement("link");
@@ -129,7 +131,7 @@
     }
     if (
       !target.querySelector(
-        'link[rel="preconnect"][href="https://fonts.gstatic.com"]'
+        'link[rel="preconnect"][href="https://fonts.gstatic.com"]',
       )
     ) {
       const pc2 = document.createElement("link");
@@ -141,7 +143,7 @@
 
     // The actual font stylesheet (dedupe by href)
     let link = target.querySelector(
-      `link[rel="stylesheet"][href="${fontUrl}"]`
+      `link[rel="stylesheet"][href="${fontUrl}"]`,
     );
     if (!link) {
       link = document.createElement("link");
@@ -159,6 +161,8 @@
   let menuOpen = $state(false);
   let speedOpen = $state(false);
   let playbackRate = $state(1);
+  let menuEl;
+  let menuBtnEl;
 
   const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -180,8 +184,8 @@
       0,
       Math.min(
         (audioEl.currentTime || 0) + delta,
-        Number.isFinite(dur) ? dur : 0
-      )
+        Number.isFinite(dur) ? dur : 0,
+      ),
     );
     audioEl.currentTime = next;
   }
@@ -223,7 +227,7 @@
         e.preventDefault();
         audioEl.currentTime = Math.min(
           audioEl.duration,
-          audioEl.currentTime + step
+          audioEl.currentTime + step,
         );
         break;
       case "Home":
@@ -242,7 +246,7 @@
         e.preventDefault();
         audioEl.currentTime = Math.min(
           audioEl.duration,
-          audioEl.currentTime + 10
+          audioEl.currentTime + 10,
         );
         break;
     }
@@ -253,6 +257,15 @@
     if (audioEl) audioEl.playbackRate = s;
   }
 
+  function setHostVar(name, value) {
+    const root = audioEl?.getRootNode?.() || document;
+    const host = root.host; // only exists when in shadow DOM
+    if (!host) return;
+
+    if (value == null || value === "") host.style.removeProperty(name);
+    else host.style.setProperty(name, String(value));
+  }
+
   // Keep the element's playbackRate in sync if prop changes
   $effect(() => {
     if (audioEl) audioEl.playbackRate = playbackRate;
@@ -260,19 +273,48 @@
 
   // Close menus on outside clicks — attach and clean up properly
   $effect(() => {
-    function onDocClick(e) {
-      // if click is outside this custom element, close menus
-      const root =
-        (typeof getRootNode === "function" && getRootNode()) || document;
-      const host = root.host || null;
-      const path = e.composedPath ? e.composedPath() : [e.target];
-      if (host && !path.includes(host)) {
+    function onDocPointerDown(e) {
+      if (!menuOpen) return;
+
+      const path = e.composedPath?.() ?? [];
+      const inMenu = menuEl && path.includes(menuEl);
+      const inBtn = menuBtnEl && path.includes(menuBtnEl);
+
+      if (!inMenu && !inBtn) {
         menuOpen = false;
         speedOpen = false;
       }
     }
-    document.addEventListener("click", onDocClick);
-    return () => document.removeEventListener("click", onDocClick);
+
+    document.addEventListener("pointerdown", onDocPointerDown, true);
+    return () =>
+      document.removeEventListener("pointerdown", onDocPointerDown, true);
+  });
+
+  $effect(() => {
+    // border radius
+    setHostVar("--ab-border-radius", borderRadius);
+
+    // theme colors
+    setHostVar("--ab-text", textColor);
+    setHostVar("--ab-surface", surface);
+    setHostVar("--ab-accent", accent);
+    setHostVar("--ab-title-size", titleSize);
+
+    // progress
+    setHostVar("--ab-progress-bg", progressBg);
+    setHostVar("--ab-progress-fill", progressFill);
+
+    // menu
+    setHostVar("--ab-menu-bg", menuBg);
+    setHostVar("--ab-menu-fg", menuFg);
+    setHostVar("--ab-menu-hover-bg", menuHoverBg);
+    setHostVar("--ab-menu-hover-fg", menuHoverFg);
+
+    // icon filters
+    setHostVar("--ab-icon-filter", iconFilter);
+    setHostVar("--ab-menu-icon-filter", menuIconFilter);
+    setHostVar("--ab-menu-icon-hover-filter", menuIconHoverFilter);
   });
 </script>
 
@@ -356,77 +398,81 @@
             menuOpen = !menuOpen;
             speedOpen = false;
           }}
+          bind:this={menuBtnEl}
         >
           <img class="icon-img" alt="Menu" src={iconMenu} />
         </button>
 
-        <div class="menu" class:open={menuOpen} role="menu">
-          <button
-            class="item"
-            role="menuitem"
-            onclick={() => {
-              if (!audioSrc) return;
-              const a = document.createElement("a");
-              a.href = audioSrc.includes("/upload/")
-                ? audioSrc.replace("upload/", "upload/fl_attachment/")
-                : audioSrc;
-              a.download = "";
-              a.click();
-              menuOpen = false;
-            }}
-          >
-            <img class="mini-icon" alt="" src={iconDownload} />
-            Download Audio
-          </button>
-
-          {#if transcriptSrc}
+        <div class="menu" bind:this={menuEl} class:open={menuOpen} role="menu">
+          {#if !speedOpen}
+            <!--download button-->
             <button
               class="item"
               role="menuitem"
               onclick={() => {
+                if (!audioSrc) return;
                 const a = document.createElement("a");
-                a.href = transcriptSrc;
-                a.target = "_blank";
+                a.href = audioSrc.includes("/upload/")
+                  ? audioSrc.replace("upload/", "upload/fl_attachment/")
+                  : audioSrc;
+                a.download = "";
                 a.click();
                 menuOpen = false;
               }}
             >
               <img class="mini-icon" alt="" src={iconDownload} />
-              Download Transcript
+              Download Audio
             </button>
-          {/if}
 
-          <button
-            class="item"
-            role="menuitem"
-            onclick={async () => {
-              const shareUrl = audioSrc || location.href;
-              try {
-                if (navigator.share) {
-                  await navigator.share({ title, url: shareUrl });
-                } else if (navigator.clipboard) {
-                  await navigator.clipboard.writeText(shareUrl);
-                }
-              } catch {}
-              menuOpen = false;
-            }}
-          >
-            <img class="mini-icon" alt="" src={iconShare} />
-            Share Audio
-          </button>
+            {#if transcriptSrc}
+              <button
+                class="item"
+                role="menuitem"
+                onclick={() => {
+                  const a = document.createElement("a");
+                  a.href = transcriptSrc;
+                  a.target = "_blank";
+                  a.click();
+                  menuOpen = false;
+                }}
+              >
+                <img class="mini-icon" alt="" src={iconDownload} />
+                Download Transcript
+              </button>
+            {/if}
 
-          <button
-            class="item"
-            role="menuitem"
-            onclick={() => {
-              speedOpen = true;
-            }}
-          >
-            <img class="mini-icon" alt="" src={iconSpeed} />
-            Playback Speed
-          </button>
+            <!--share button-->
+            <button
+              class="item"
+              role="menuitem"
+              onclick={async () => {
+                const shareUrl = audioSrc || location.href;
+                try {
+                  if (navigator.share) {
+                    await navigator.share({ title, url: shareUrl });
+                  } else if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(shareUrl);
+                  }
+                } catch {}
+                menuOpen = false;
+              }}
+            >
+              <img class="mini-icon" alt="" src={iconShare} />
+              Share Audio
+            </button>
 
-          {#if speedOpen}
+            <!--speed button-->
+            <button
+              class="item"
+              role="menuitem"
+              onclick={() => {
+                speedOpen = true;
+              }}
+            >
+              <img class="mini-icon" alt="" src={iconSpeed} />
+              Playback Speed
+            </button>
+          {:else}
             <div class="submenu" style="padding:6px 6px 10px">
               <button
                 class="item"
@@ -468,6 +514,7 @@
     width: 100%;
     height: 411px;
     border-radius: var(--ab-border-radius, 20px);
+    overflow: hidden;
   }
 
   @media (min-width: 900px) {
@@ -570,7 +617,7 @@
     display: none;
     position: absolute;
     right: 0;
-    top: -4px;
+    bottom: calc(100% + 8px);
     background: var(--ab-menu-bg, #f9f9f9);
     color: var(--ab-menu-fg, #111);
     min-width: 180px;
