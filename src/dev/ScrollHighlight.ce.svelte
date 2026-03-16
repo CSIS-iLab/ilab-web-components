@@ -38,7 +38,7 @@
         reflect: true,
       },
       fontSize: {
-        attribute: "paragraph-size",
+        attribute: "font-size",
         type: "String",
         reflect: true,
       },
@@ -275,7 +275,7 @@
   style:--max-width={toPx(maxWidth)}
   style:--text-color={textColor}
 >
-  <slot></slot>
+  <svelte:element this={"slot"} />
 </div>
 
 <style>
