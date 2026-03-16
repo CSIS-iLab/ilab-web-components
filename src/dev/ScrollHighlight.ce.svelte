@@ -279,10 +279,16 @@
 </div>
 
 <style>
+  :host {
+    display: block;
+    width: 100%;
+  }
+
   .scroll-highlight {
     display: block;
     width: 100%;
     max-width: var(--max-width);
+    margin: 0 auto;
     color: var(--text-color);
   }
 </style>
