@@ -24,7 +24,7 @@
       },
       maxWidth: {
         attribute: "max-width",
-        type: "String",
+        type: "Number",
         reflect: true,
       },
       fontUrl: {
@@ -37,23 +37,13 @@
         type: "String",
         reflect: true,
       },
-      headingSize: {
-        attribute: "heading-size",
-        type: "String",
-        reflect: true,
-      },
-      paragraphSize: {
+      fontSize: {
         attribute: "paragraph-size",
         type: "String",
         reflect: true,
       },
       lineHeight: {
         attribute: "line-height",
-        type: "String",
-        reflect: true,
-      },
-      space: {
-        attribute: "space",
         type: "String",
         reflect: true,
       },
@@ -80,14 +70,12 @@
   export let highlightColor = "#ffe44d";
   export let textColor = "#24343a";
   export let activeTextColor = "#000";
-  export let maxWidth = "80ch";
+  export let maxWidth = "800";
 
   export let fontUrl = "";
   export let fontFamily = '"Lora", Georgia, serif';
-  export let headingSize = "clamp(2rem, 8vw, 4rem)";
-  export let paragraphSize = "clamp(1.2rem, 4vw, 1.4rem)";
+  export let fontSize = "1.25rem";
   export let lineHeight = "1.7";
-  export let space = "2rem";
 
   // Similar spirit to the CodePen’s “-100px center” start point.
   export let triggerStart = "top 70%";
@@ -140,15 +128,11 @@
     const nodes = [];
 
     roots.forEach((root) => {
-      if (root.matches?.("p, h1, h2, h3, h4, h5, h6, ul, ol, li, blockquote")) {
+      if (root.matches?.("p, ul, ol, li, blockquote")) {
         nodes.push(root);
       }
 
-      nodes.push(
-        ...root.querySelectorAll(
-          "p, h1, h2, h3, h4, h5, h6, ul, ol, li, blockquote",
-        ),
-      );
+      nodes.push(...root.querySelectorAll("p, ul, ol, li, blockquote"));
     });
 
     return [...new Set(nodes)];
@@ -160,24 +144,8 @@
     nodes.forEach((node) => {
       node.style.color = textColor;
       node.style.fontFamily = fontFamily;
-      node.style.maxWidth = maxWidth;
-
-      if (node.matches("p, li, blockquote")) {
-        node.style.fontSize = paragraphSize;
-        node.style.lineHeight = lineHeight;
-        node.style.margin = `${space} 0`;
-      }
-
-      if (node.matches("h1")) {
-        node.style.fontSize = headingSize;
-        node.style.lineHeight = "1.2";
-        node.style.margin = `0 0 calc(${space} * 2) 0`;
-      }
-
-      if (node.matches("h2, h3, h4, h5, h6")) {
-        node.style.lineHeight = "1.2";
-        node.style.margin = `calc(${space} * 1.5) 0 ${space} 0`;
-      }
+      node.style.fontSize = fontSize;
+      node.style.lineHeight = lineHeight;
     });
   }
 
@@ -256,6 +224,11 @@
     document.head.appendChild(fontLink);
   }
 
+  function toPx(value) {
+    if (value === null || value === undefined || value === "") return "";
+    return typeof value === "number" ? `${value}px` : value;
+  }
+
   onMount(() => {
     setupFont();
 
@@ -299,7 +272,7 @@
 <div
   bind:this={rootEl}
   class="scroll-highlight"
-  style:--max-width={maxWidth}
+  style:--max-width={toPx(maxWidth)}
   style:--text-color={textColor}
 >
   <slot></slot>
@@ -309,6 +282,7 @@
   .scroll-highlight {
     display: block;
     width: 100%;
+    max-width: var(--max-width);
     color: var(--text-color);
   }
 </style>
