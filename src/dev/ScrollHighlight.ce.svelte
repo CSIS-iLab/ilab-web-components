@@ -1,6 +1,7 @@
 <svelte:options
   customElement={{
     tag: "csis-scroll-highlight",
+    shadow: "none",
     props: {
       highlightStyle: {
         attribute: "highlight-style",
