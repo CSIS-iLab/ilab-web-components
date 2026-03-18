@@ -269,8 +269,16 @@
   $: knobPoint = polarToCartesian(cx, cy, knobR, progressAngle);
 
   const knobVisibleR = 19.5;
+  const activeStrokeWidth = 10;
+  const stemStrokeWidth = 1.5;
 
-  $: stemInner = polarToCartesian(cx, cy, dialR, progressAngle);
+  $: stemInner = polarToCartesian(
+    cx,
+    cy,
+    dialR - activeStrokeWidth / 2 + stemStrokeWidth / 2,
+    progressAngle,
+  );
+
   $: stemOuter = polarToCartesian(cx, cy, knobR - knobVisibleR, progressAngle);
 
   onDestroy(() => {
@@ -317,7 +325,7 @@
         fill="none"
         stroke={activeArcColor}
         stroke-width="10"
-        stroke-linecap="round"
+        stroke-linecap="butt"
       />
     {/if}
 
@@ -393,6 +401,7 @@
       y2={stemOuter.y}
       stroke={activeArcColor}
       stroke-width="1.5"
+      stroke-linecap="square"
     />
 
     <!-- knob -->
