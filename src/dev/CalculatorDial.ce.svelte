@@ -80,7 +80,6 @@
   export let labelColor = "#57c7d5";
   export let inactiveArcColor = "#f1f1f1";
   export let activeArcColor = "#4cb6c3";
-  export let dashedArcColor = "#d9eef1";
   export let knobColor = "#ffffff";
   export let knobIconColor = "#18323a";
   export let titleColor = "#57c7d5";
@@ -92,7 +91,6 @@
   const cy = 360;
   const outerRingR = 245;
   const dialR = 210;
-  const dashedR = 184;
   const knobR = 268;
 
   let svgEl;
@@ -218,9 +216,7 @@
     const y = ((clientY - rect.top) / rect.height) * 720;
 
     let angle = (Math.atan2(y - cy, x - cx) * 180) / Math.PI + 90;
-
     if (angle < 0) angle += 360;
-
     return angle;
   }
 
@@ -248,20 +244,27 @@
     window.removeEventListener("pointerup", handlePointerUp);
   }
 
-  function markerPercent(index, total) {
-    if (total <= 1) return minPercent;
-    return minPercent + ((maxPercent - minPercent) / (total - 1)) * index;
+  function getTickPercents() {
+    const ticks = [];
+
+    for (let p = 0; p <= maxPercent; p += 10) {
+      ticks.push(p);
+    }
+
+    return ticks;
   }
 
+  $: tickPercents = getTickPercents();
   $: parseData();
   $: updateValue();
   $: progressAngle = percentToAngle(currentPercent);
 
-  // 0% at top, 50% at bottom, matching the original
-  $: activePath = describeArc(cx, cy, dialR, 0, progressAngle);
-  $: inactivePath = describeArc(cx, cy, dialR, progressAngle, 180);
-  $: fullBackground = describeArc(cx, cy, dialR, 180, 360);
-  $: dashedTopPath = describeArc(cx, cy, dashedR, 350, 25);
+  $: activePath =
+    progressAngle === 0
+      ? ""
+      : progressAngle >= 360
+        ? describeArc(cx, cy, dialR, 0, 359.999)
+        : describeArc(cx, cy, dialR, 0, progressAngle);
 
   $: knobPoint = polarToCartesian(cx, cy, knobR, progressAngle);
   $: stemInner = polarToCartesian(cx, cy, dialR + 2, progressAngle);
@@ -296,32 +299,27 @@
       opacity="0.9"
     />
 
-    <path
-      d={fullBackground}
-      fill="none"
-      stroke={inactiveArcColor}
-      stroke-width="10"
-    />
-    <!-- inactive right side -->
-    <path
-      d={inactivePath}
+    <circle
+      {cx}
+      {cy}
+      r={dialR}
       fill="none"
       stroke={inactiveArcColor}
       stroke-width="10"
     />
 
-    <!-- active ring -->
-    <path
-      d={activePath}
-      fill="none"
-      stroke={activeArcColor}
-      stroke-width="10"
-      stroke-linecap="round"
-    />
+    {#if activePath}
+      <path
+        d={activePath}
+        fill="none"
+        stroke={activeArcColor}
+        stroke-width="10"
+        stroke-linecap="round"
+      />
+    {/if}
 
     <!-- marker ticks + labels -->
-    {#each Array(6) as _, i}
-      {@const p = markerPercent(i, 6)}
+    {#each tickPercents as p}
       {@const a = percentToAngle(p)}
       {@const tickStart = polarToCartesian(cx, cy, outerRingR, a)}
       {@const tickEnd = polarToCartesian(cx, cy, outerRingR + 14, a)}
@@ -344,10 +342,9 @@
         text-anchor="middle"
         dominant-baseline="middle"
       >
-        {Math.round(p)}%
+        {p}%
       </text>
     {/each}
-
     <!-- center percent -->
     <text
       x="360"
