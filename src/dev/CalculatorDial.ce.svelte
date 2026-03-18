@@ -93,6 +93,8 @@
   const outerRingR = 235;
   const dialR = 210;
   const knobR = 268;
+  const tickHeight = 14;
+  const tickWidth = 1.5;
 
   let svgEl;
   let dragging = false;
@@ -337,9 +339,9 @@
     );
 
     gsap.set(tickEls, {
-      opacity: 0,
-      scaleY: 0,
-      transformOrigin: "center center",
+      opacity: 1,
+      rotation: 0,
+      svgOrigin: `${cx} ${cy}`,
     });
 
     gsap.set(tickLabelEls, {
@@ -364,12 +366,13 @@
       .to(
         tickEls,
         {
-          opacity: 1,
-          scaleY: 1,
-          duration: 0.35,
-          stagger: 0.05,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power2.out",
+          rotation: (i) => percentToAngle(tickPercents[i]),
+          svgOrigin: `${cx} ${cy}`,
         },
-        "-=0.15",
+        "-=0.4",
       )
       .to(
         tickLabelEls,
@@ -472,7 +475,7 @@
       {@const tickEnd = polarToCartesian(cx, cy, outerRingR + 14, a)}
       {@const label = polarToCartesian(cx, cy, outerRingR + 38, a)}
 
-      <line
+      <!-- <line
         bind:this={tickEls[i]}
         x1={tickStart.x}
         y1={tickStart.y}
@@ -480,6 +483,14 @@
         y2={tickEnd.y}
         stroke={tickColor}
         stroke-width="1.5"
+      /> -->
+      <rect
+        bind:this={tickEls[i]}
+        x={cx - tickWidth / 2}
+        y={cy - outerRingR - tickHeight}
+        width={tickWidth}
+        height={tickHeight}
+        fill={tickColor}
       />
 
       <text
