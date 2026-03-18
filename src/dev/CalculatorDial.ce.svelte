@@ -58,7 +58,8 @@
 />
 
 <script>
-  import { onDestroy } from "svelte";
+  import { onMount, onDestroy } from "svelte";
+  import { gsap } from "gsap";
 
   export let title = "YOUR HEADLINE HERE";
   export let subtitle = "";
@@ -96,8 +97,21 @@
   let svgEl;
   let dragging = false;
   let parsedData = [];
-  let currentPercent = clampAndSnap(initialPercent);
+  // let currentPercent = clampAndSnap(initialPercent);
+  let currentPercent = 0;
   let currentValue = 0;
+
+  let outerRingEl;
+  let inactiveRingEl;
+  let activePathEl;
+  let tickEls = [];
+  let tickLabelEls = [];
+  let centerPercentEl;
+  let headlineEl;
+  let valueEl;
+  let stemEl;
+  let knobGroupEl;
+  let introTl;
 
   function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
@@ -258,6 +272,20 @@
     return ticks;
   }
 
+  function animateToPercent(targetPercent, duration = 1.2) {
+    const state = { value: currentPercent };
+
+    gsap.to(state, {
+      value: clampAndSnap(targetPercent),
+      duration,
+      ease: "power2.out",
+      onUpdate: () => {
+        currentPercent = state.value;
+        updateValue();
+      },
+    });
+  }
+
   $: tickPercents = getTickPercents();
   $: parseData();
   $: updateValue();
@@ -285,9 +313,112 @@
 
   $: stemOuter = polarToCartesian(cx, cy, knobR - knobVisibleR, progressAngle);
 
+  onMount(() => {
+    updateValue();
+
+    tickEls = tickEls.filter(Boolean);
+    tickLabelEls = tickLabelEls.filter(Boolean);
+
+    introTl = gsap.timeline({ defaults: { ease: "power2.out" } });
+
+    // hide things before animating
+    gsap.set(
+      [
+        outerRingEl,
+        inactiveRingEl,
+        activePathEl,
+        centerPercentEl,
+        headlineEl,
+        valueEl,
+        stemEl,
+        knobGroupEl,
+      ],
+      { opacity: 0 },
+    );
+
+    gsap.set(tickEls, {
+      opacity: 0,
+      scaleY: 0,
+      transformOrigin: "center center",
+    });
+
+    gsap.set(tickLabelEls, {
+      opacity: 0,
+      y: -8,
+    });
+
+    gsap.set(knobGroupEl, {
+      scale: 0.85,
+      transformOrigin: "center center",
+    });
+
+    gsap.set(stemEl, {
+      opacity: 0,
+    });
+
+    introTl
+      .to([outerRingEl, inactiveRingEl], {
+        opacity: 1,
+        duration: 0.5,
+      })
+      .to(
+        tickEls,
+        {
+          opacity: 1,
+          scaleY: 1,
+          duration: 0.35,
+          stagger: 0.05,
+        },
+        "-=0.15",
+      )
+      .to(
+        tickLabelEls,
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.35,
+          stagger: 0.05,
+        },
+        "-=0.2",
+      )
+      .to(
+        [centerPercentEl, headlineEl, valueEl],
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.45,
+          stagger: 0.08,
+        },
+        "-=0.2",
+      )
+      .to(
+        stemEl,
+        {
+          opacity: 1,
+          duration: 0.25,
+        },
+        "-=0.15",
+      )
+      .to(
+        knobGroupEl,
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.35,
+        },
+        "-=0.1",
+      )
+      .add(() => {
+        animateToPercent(initialPercent, 1.1);
+      }, "-=0.05");
+  });
+
   onDestroy(() => {
     window.removeEventListener("pointermove", handlePointerMove);
     window.removeEventListener("pointerup", handlePointerUp);
+
+    if (introTl) introTl.kill();
+    gsap.killTweensOf("*");
   });
 </script>
 
@@ -305,6 +436,7 @@
   >
     <!-- outer guide ring -->
     <circle
+      bind:this={outerRingEl}
       {cx}
       {cy}
       r={outerRingR}
@@ -313,8 +445,8 @@
       stroke-width="1.5"
       opacity="0.9"
     />
-
     <circle
+      bind:this={inactiveRingEl}
       {cx}
       {cy}
       r={dialR}
@@ -325,6 +457,7 @@
 
     {#if activePath}
       <path
+        bind:this={activePathEl}
         d={activePath}
         fill="none"
         stroke={activeArcColor}
@@ -332,15 +465,15 @@
         stroke-linecap="butt"
       />
     {/if}
-
     <!-- marker ticks + labels -->
-    {#each tickPercents as p}
+    {#each tickPercents as p, i}
       {@const a = percentToAngle(p)}
       {@const tickStart = polarToCartesian(cx, cy, outerRingR, a)}
       {@const tickEnd = polarToCartesian(cx, cy, outerRingR + 14, a)}
       {@const label = polarToCartesian(cx, cy, outerRingR + 38, a)}
 
       <line
+        bind:this={tickEls[i]}
         x1={tickStart.x}
         y1={tickStart.y}
         x2={tickEnd.x}
@@ -350,6 +483,7 @@
       />
 
       <text
+        bind:this={tickLabelEls[i]}
         x={label.x}
         y={label.y}
         fill={labelColor}
@@ -362,6 +496,7 @@
     {/each}
     <!-- center percent -->
     <text
+      bind:this={centerPercentEl}
       x="360"
       y="250"
       fill={valueColor}
@@ -374,6 +509,7 @@
 
     <!-- center headline -->
     <text
+      bind:this={headlineEl}
       x="360"
       y="315"
       fill={titleColor}
@@ -388,6 +524,7 @@
 
     <!-- value -->
     <text
+      bind:this={valueEl}
       x="360"
       y="405"
       fill={valueColor}
@@ -399,6 +536,7 @@
 
     <!-- stem -->
     <line
+      bind:this={stemEl}
       x1={stemInner.x}
       y1={stemInner.y}
       x2={stemOuter.x}
@@ -410,6 +548,7 @@
 
     <!-- knob -->
     <g
+      bind:this={knobGroupEl}
       transform={`translate(${knobPoint.x} ${knobPoint.y}) rotate(${progressAngle})`}
       class="knob-group"
       on:pointerdown={handlePointerDown}
