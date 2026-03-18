@@ -298,17 +298,12 @@
       opacity="0.9"
     />
 
-    <!-- dashed guide arc near top -->
     <path
-      d={dashedTopPath}
+      d={fullBackground}
       fill="none"
-      stroke={dashedArcColor}
-      stroke-width="3"
-      stroke-dasharray="4 10"
-      stroke-linecap="round"
+      stroke={inactiveArcColor}
+      stroke-width="10"
     />
-    <path d={fullBackground} fill="none" stroke="#e6e6e6" stroke-width="10" />
-
     <!-- inactive right side -->
     <path
       d={inactivePath}
