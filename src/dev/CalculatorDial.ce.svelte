@@ -391,7 +391,7 @@
       y1={stemInner.y}
       x2={stemOuter.x}
       y2={stemOuter.y}
-      stroke={tickColor}
+      stroke={activeArcColor}
       stroke-width="1.5"
     />
 
@@ -405,7 +405,7 @@
         class="knob-visible"
         r="20"
         fill={knobColor}
-        stroke={outerRingColor}
+        stroke={activeArcColor}
         stroke-width="1.5"
       />
       <circle r="30" fill="transparent" />
