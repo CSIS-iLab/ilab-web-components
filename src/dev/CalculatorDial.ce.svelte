@@ -394,22 +394,26 @@
 
     <!-- knob -->
     <g
-      transform={`translate(${knobPoint.x} ${knobPoint.y})`}
+      transform={`translate(${knobPoint.x} ${knobPoint.y}) rotate(${progressAngle})`}
       class="knob-group"
       on:pointerdown={handlePointerDown}
     >
-      <circle r="22" fill={knobColor} />
+      <circle
+        class="knob-visible"
+        r="20"
+        fill={knobColor}
+        stroke={outerRingColor}
+        stroke-width="1.5"
+      />
       <circle r="30" fill="transparent" />
-      <text
-        x="0"
-        y="2"
-        text-anchor="middle"
-        dominant-baseline="middle"
-        fill={knobIconColor}
-        class="knob-icon"
-      >
-        ↔
-      </text>
+
+      <g class="knob-icon" fill={knobIconColor} pointer-events="none">
+        <rect x="-9" y="-0.5" width="18" height="1" />
+        <polygon
+          points="-6.73,3.18 -6,2.48 -8.55,0 -6,-2.47 -6.73,-3.18 -10,0"
+        />
+        <polygon points="6.73,3.18 6,2.48 8.55,0 6,-2.47 6.73,-3.18 10,0" />
+      </g>
     </g>
   </svg>
 </div>
