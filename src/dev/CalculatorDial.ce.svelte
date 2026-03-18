@@ -89,7 +89,7 @@
 
   const cx = 360;
   const cy = 360;
-  const outerRingR = 245;
+  const outerRingR = 235;
   const dialR = 210;
   const knobR = 268;
 
