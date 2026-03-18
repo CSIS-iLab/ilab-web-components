@@ -267,8 +267,11 @@
         : describeArc(cx, cy, dialR, 0, progressAngle);
 
   $: knobPoint = polarToCartesian(cx, cy, knobR, progressAngle);
-  $: stemInner = polarToCartesian(cx, cy, dialR + 2, progressAngle);
-  $: stemOuter = polarToCartesian(cx, cy, knobR - 28, progressAngle);
+
+  const knobVisibleR = 19.5;
+
+  $: stemInner = polarToCartesian(cx, cy, dialR, progressAngle);
+  $: stemOuter = polarToCartesian(cx, cy, knobR - knobVisibleR, progressAngle);
 
   onDestroy(() => {
     window.removeEventListener("pointermove", handlePointerMove);
@@ -295,7 +298,7 @@
       r={outerRingR}
       fill="none"
       stroke={outerRingColor}
-      stroke-width="2"
+      stroke-width="1.5"
       opacity="0.9"
     />
 
@@ -331,7 +334,7 @@
         x2={tickEnd.x}
         y2={tickEnd.y}
         stroke={tickColor}
-        stroke-width="2"
+        stroke-width="1.5"
       />
 
       <text
@@ -389,7 +392,7 @@
       x2={stemOuter.x}
       y2={stemOuter.y}
       stroke={tickColor}
-      stroke-width="2"
+      stroke-width="1.5"
     />
 
     <!-- knob -->
