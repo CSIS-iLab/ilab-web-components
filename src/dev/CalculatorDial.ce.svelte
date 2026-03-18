@@ -142,14 +142,13 @@
   }
 
   function percentToAngle(percent) {
-    const range = maxPercent - minPercent || 1;
-    const t = (percent - minPercent) / range;
-    return t * 180; // 👈 key change
+    const clamped = clamp(percent, 0, 100);
+    return (clamped / 100) * 360;
   }
 
   function angleToPercent(angle) {
-    const range = maxPercent - minPercent || 1;
-    return minPercent + (angle / 180) * range;
+    const normalized = ((angle % 360) + 360) % 360;
+    return (normalized / 360) * 100;
   }
 
   function parseData() {
@@ -220,8 +219,7 @@
 
     let angle = (Math.atan2(y - cy, x - cx) * 180) / Math.PI + 90;
 
-    // 👇 clamp to 0–180 (right side only)
-    angle = Math.max(0, Math.min(180, angle));
+    if (angle < 0) angle += 360;
 
     return angle;
   }
