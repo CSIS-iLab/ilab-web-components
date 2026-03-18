@@ -251,6 +251,10 @@
       ticks.push(p);
     }
 
+    if (maxPercent % 10 !== 0 && !ticks.includes(maxPercent)) {
+      ticks.push(maxPercent);
+    }
+
     return ticks;
   }
 
