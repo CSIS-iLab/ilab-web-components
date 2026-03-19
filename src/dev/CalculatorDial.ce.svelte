@@ -53,6 +53,12 @@
       valueColor: { attribute: "value-color", type: "String", reflect: true },
 
       fontFamily: { attribute: "font-family", type: "String", reflect: true },
+
+      animationDuration: {
+        attribute: "animation-duration",
+        type: "Number",
+        reflect: true,
+      },
     },
   }}
 />
@@ -87,6 +93,8 @@
   export let valueColor = "#57c7d5";
 
   export let fontFamily = "'IBM Plex Sans', system-ui, sans-serif";
+
+  export let animationDuration = 1;
 
   const cx = 360;
   const cy = 360;
@@ -355,7 +363,12 @@
     setCircleDraw(outerRingEl, outerRingR);
     setCircleDraw(inactiveRingEl, dialR);
 
-    introTl = gsap.timeline({ defaults: { ease: "power2.out" } });
+    introTl = gsap.timeline({
+      defaults: {
+        ease: "power2.out",
+        duration: animationDuration,
+      },
+    });
 
     // hide things before animating
     gsap.set([centerPercentEl, headlineEl, valueEl, stemEl, knobGroupEl], {
@@ -385,14 +398,14 @@
     introTl
       .to(inactiveRingEl, {
         strokeDashoffset: 0,
-        duration: 0.8,
+        duration: 0.8 * animationDuration,
         ease: "power4.inOut",
       })
       .to(
         outerRingEl,
         {
           strokeDashoffset: 0,
-          duration: 0.8,
+          duration: 0.8 * animationDuration,
           ease: "power4.inOut",
         },
         "-=0.6",
@@ -400,7 +413,7 @@
       .to(
         tickEls,
         {
-          duration: 0.8,
+          duration: 0.8 * animationDuration,
           stagger: 0.1,
           ease: "power2.out",
           rotation: (i) => percentToAngle(tickPercents[i]),
@@ -413,7 +426,7 @@
         {
           opacity: 1,
           y: 0,
-          duration: 0.35,
+          duration: 0.35 * animationDuration,
           stagger: 0.05,
         },
         "-=0.2",
@@ -423,7 +436,7 @@
         {
           opacity: 1,
           y: 0,
-          duration: 0.45,
+          duration: 0.45 * animationDuration,
           stagger: 0.08,
         },
         "-=0.2",
@@ -432,7 +445,7 @@
         stemEl,
         {
           opacity: 1,
-          duration: 0.25,
+          duration: 0.25 * animationDuration,
         },
         "-=0.15",
       )
@@ -441,12 +454,12 @@
         {
           opacity: 1,
           scale: 1,
-          duration: 0.35,
+          duration: 0.35 * animationDuration,
         },
         "-=0.1",
       )
       .add(() => {
-        animateToPercent(initialPercent, 1.1);
+        animateToPercent(initialPercent, 1.1 * animationDuration);
       }, "-=0.05");
   });
 
