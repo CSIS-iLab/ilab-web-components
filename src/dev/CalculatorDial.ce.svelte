@@ -491,19 +491,8 @@
     <!-- marker ticks + labels -->
     {#each tickPercents as p, i}
       {@const a = percentToAngle(p)}
-      {@const tickStart = polarToCartesian(cx, cy, outerRingR, a)}
-      {@const tickEnd = polarToCartesian(cx, cy, outerRingR + 14, a)}
       {@const label = polarToCartesian(cx, cy, outerRingR + 38, a)}
 
-      <!-- <line
-        bind:this={tickEls[i]}
-        x1={tickStart.x}
-        y1={tickStart.y}
-        x2={tickEnd.x}
-        y2={tickEnd.y}
-        stroke={tickColor}
-        stroke-width="1.5"
-      /> -->
       <rect
         bind:this={tickEls[i]}
         x={cx - tickWidth / 2}
