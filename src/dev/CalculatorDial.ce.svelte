@@ -237,7 +237,29 @@
   }
 
   function setPercentFromPointer(clientX, clientY) {
-    currentPercent = angleToPercent(getPointerAngle(clientX, clientY));
+    const rawAngle = getPointerAngle(clientX, clientY);
+
+    const minAngle = percentToAngle(minPercent);
+    const maxAngle = percentToAngle(maxPercent);
+
+    let clampedAngle = rawAngle;
+
+    // If pointer is outside the allowed arc, clamp to the nearest end
+    if (rawAngle < minAngle || rawAngle > maxAngle) {
+      const distToMin = Math.min(
+        Math.abs(rawAngle - minAngle),
+        360 - Math.abs(rawAngle - minAngle),
+      );
+
+      const distToMax = Math.min(
+        Math.abs(rawAngle - maxAngle),
+        360 - Math.abs(rawAngle - maxAngle),
+      );
+
+      clampedAngle = distToMin <= distToMax ? minAngle : maxAngle;
+    }
+
+    currentPercent = clampAndSnap(angleToPercent(clampedAngle));
     updateValue();
   }
 
@@ -336,16 +358,9 @@
     introTl = gsap.timeline({ defaults: { ease: "power2.out" } });
 
     // hide things before animating
-    gsap.set(
-      [
-        centerPercentEl,
-        headlineEl,
-        valueEl,
-        stemEl,
-        knobGroupEl,
-      ],
-      { opacity: 0 },
-    );
+    gsap.set([centerPercentEl, headlineEl, valueEl, stemEl, knobGroupEl], {
+      opacity: 0,
+    });
 
     gsap.set(tickEls, {
       opacity: 1,
