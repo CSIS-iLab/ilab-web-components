@@ -38,11 +38,6 @@
         type: "String",
         reflect: true,
       },
-      dashedArcColor: {
-        attribute: "dashed-arc-color",
-        type: "String",
-        reflect: true,
-      },
       knobColor: { attribute: "knob-color", type: "String", reflect: true },
       knobIconColor: {
         attribute: "knob-icon-color",
@@ -78,9 +73,6 @@
   export let prefix = "";
   export let suffix = "";
   export let dataJson = "";
-
-  export let size = 720;
-
   export let bgColor = "#ffffff";
   export let outerRingColor = "#9adce4";
   export let tickColor = "#57c7d5";
