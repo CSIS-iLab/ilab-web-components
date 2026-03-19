@@ -491,6 +491,7 @@
       fill="none"
       stroke={inactiveArcColor}
       stroke-width="10"
+      transform={`rotate(-90 ${cx} ${cy})`}
     />
 
     {#if activePath}
