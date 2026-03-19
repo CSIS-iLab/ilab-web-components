@@ -288,6 +288,15 @@
     });
   }
 
+  function setCircleDraw(el, radius) {
+    if (!el) return 0;
+
+    const length = 2 * Math.PI * radius;
+    el.style.strokeDasharray = `${length}`;
+    el.style.strokeDashoffset = `${length}`;
+    return length;
+  }
+
   $: tickPercents = getTickPercents();
   $: parseData();
   $: updateValue();
@@ -321,14 +330,14 @@
     tickEls = tickEls.filter(Boolean);
     tickLabelEls = tickLabelEls.filter(Boolean);
 
+    setCircleDraw(outerRingEl, outerRingR);
+    setCircleDraw(inactiveRingEl, dialR);
+
     introTl = gsap.timeline({ defaults: { ease: "power2.out" } });
 
     // hide things before animating
     gsap.set(
       [
-        outerRingEl,
-        inactiveRingEl,
-        activePathEl,
         centerPercentEl,
         headlineEl,
         valueEl,
@@ -346,7 +355,7 @@
 
     gsap.set(tickLabelEls, {
       opacity: 0,
-      y: -8,
+      y: -12,
     });
 
     gsap.set(knobGroupEl, {
@@ -359,10 +368,20 @@
     });
 
     introTl
-      .to([outerRingEl, inactiveRingEl], {
-        opacity: 1,
-        duration: 0.5,
+      .to(inactiveRingEl, {
+        strokeDashoffset: 0,
+        duration: 0.8,
+        ease: "power4.inOut",
       })
+      .to(
+        outerRingEl,
+        {
+          strokeDashoffset: 0,
+          duration: 0.8,
+          ease: "power4.inOut",
+        },
+        "-=0.6",
+      )
       .to(
         tickEls,
         {
@@ -447,6 +466,7 @@
       stroke={outerRingColor}
       stroke-width="1.5"
       opacity="0.9"
+      transform={`rotate(-90 ${cx} ${cy})`}
     />
     <circle
       bind:this={inactiveRingEl}
