@@ -69,7 +69,7 @@
   export let minValue = 0;
   export let maxValue = 2550412;
   export let step = 1;
-  export let prefix = "$";
+  export let prefix = "";
   export let suffix = "";
   export let dataJson = "";
 
