@@ -71,7 +71,7 @@
   export let subtitle = "";
   export let minPercent = 0;
   export let maxPercent = 50;
-  export let initialPercent = 50;
+  export let initialPercent = 10;
   export let minValue = 0;
   export let maxValue = 2550412;
   export let step = 1;
