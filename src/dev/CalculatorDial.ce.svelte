@@ -54,6 +54,12 @@
         type: "Number",
         reflect: true,
       },
+
+      showMaxTick: {
+        attribute: "show-max-tick",
+        type: "Boolean",
+        reflect: true,
+      },
     },
   }}
 />
@@ -83,10 +89,9 @@
   export let knobIconColor = "#18323a";
   export let titleColor = "#57c7d5";
   export let valueColor = "#57c7d5";
-
   export let fontFamily = "'IBM Plex Sans', system-ui, sans-serif";
-
   export let animationDuration = 1;
+  export let showMaxTick = true;
 
   const cx = 360;
   const cy = 360;
@@ -289,7 +294,7 @@
       ticks.push(p);
     }
 
-    if (maxPercent % 10 !== 0 && !ticks.includes(maxPercent)) {
+    if (showMaxTick && maxPercent % 10 !== 0 && !ticks.includes(maxPercent)) {
       ticks.push(maxPercent);
     }
 
