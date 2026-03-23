@@ -201,7 +201,7 @@
     if (!parsedData.length) {
       const range = maxPercent - minPercent || 1;
       const t = (percent - minPercent) / range;
-      return Math.round(minValue + t * (maxValue - minValue));
+      return minValue + t * (maxValue - minValue);
     }
 
     if (percent <= parsedData[0].percent) return parsedData[0].value;
@@ -216,7 +216,7 @@
       if (percent >= a.percent && percent <= b.percent) {
         const span = b.percent - a.percent || 1;
         const t = (percent - a.percent) / span;
-        return Math.round(a.value + t * (b.value - a.value));
+        return a.value + t * (b.value - a.value);
       }
     }
 
