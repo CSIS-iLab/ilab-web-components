@@ -17,9 +17,7 @@
       prefix: { type: "String", reflect: true },
       suffix: { type: "String", reflect: true },
       dataJson: { attribute: "data-json", type: "String", reflect: true },
-
       size: { type: "Number", reflect: true },
-
       bgColor: { attribute: "bg-color", type: "String", reflect: true },
       outerRingColor: {
         attribute: "outer-ring-color",
@@ -46,18 +44,20 @@
       },
       titleColor: { attribute: "title-color", type: "String", reflect: true },
       valueColor: { attribute: "value-color", type: "String", reflect: true },
-
       fontFamily: { attribute: "font-family", type: "String", reflect: true },
-
       animationDuration: {
         attribute: "animation-duration",
         type: "Number",
         reflect: true,
       },
-
       showMaxTick: {
         attribute: "show-max-tick",
         type: "Boolean",
+        reflect: true,
+      },
+      valueDecimals: {
+        attribute: "value-decimals",
+        type: "Number",
         reflect: true,
       },
     },
@@ -92,6 +92,7 @@
   export let fontFamily = "'IBM Plex Sans', system-ui, sans-serif";
   export let animationDuration = 1;
   export let showMaxTick = true;
+  export let valueDecimals = 0;
 
   const cx = 360;
   const cy = 360;
@@ -223,7 +224,12 @@
   }
 
   function formatValue(value) {
-    return `${prefix}${Number(value).toLocaleString("en-US")}${suffix}`;
+    const decimals = Math.max(0, Number(valueDecimals) || 0);
+
+    return `${prefix}${Number(value).toLocaleString("en-US", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    })}${suffix}`;
   }
 
   function updateValue() {
