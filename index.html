@@ -1,48 +1,57 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Testing</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Vite dev server prefers the leading slash -->
-    <script type="module" src="/src/dev-main.js"></script>
-    <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        min-height: 100%;
-      }
 
-      main {
-        min-height: 80vh;
-        padding: 2rem;
-        font-family:
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <title>Testing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Vite dev server prefers the leading slash -->
+  <script type="module" src="/src/dev-main.js"></script>
+  <!-- the props -->
+  <!-- <link rel="stylesheet" href="https://unpkg.com/open-props" /> -->
+  <!-- optional imports that use the props -->
+  <!-- <link rel="stylesheet" href="https://unpkg.com/open-props/normalize.min.css" /> -->
 
-      csis-audio-brief {
-        margin-bottom: 20px;
-      }
-    </style>
-  </head>
+  <style>
+    /* html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+    } */
 
-  <body>
-    <main>
-      <h1>Test page</h1>
-      <p>
-        This is just some placeholder content so we can see where the footer
-        ends up on the page.
-      </p>
-    </main>
-    <csis-audio-brief border-radius="60px"></csis-audio-brief>
-    <csis-triple-compare show-labels=true></csis-triple-compare>
+    main {
+      min-height: 80vh;
+      padding: 2rem;
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
 
-    <csis-magnifier magnifier-border-color="#fff"></csis-magnifier>
-    <csis-hidden-reach-footer></csis-hidden-reach-footer>
-  </body>
+    csis-audio-brief {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>Test page</h1>
+    <p>
+      This is just some placeholder content so we can see where the footer
+      ends up on the page.
+    </p>
+  </main>
+
+  <csis-scroll-to-bloom></csis-scroll-to-bloom>
+  <csis-audio-brief border-radius="60px"></csis-audio-brief>
+  <csis-triple-compare show-labels=true></csis-triple-compare>
+
+  <csis-magnifier magnifier-border-color="#fff"></csis-magnifier>
+  <csis-hidden-reach-footer></csis-hidden-reach-footer>
+</body>
+
 </html>
