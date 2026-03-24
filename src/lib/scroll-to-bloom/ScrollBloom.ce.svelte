@@ -92,7 +92,7 @@
     }
   }
 
-  @layer demo {
+  @layer card-animation {
     .card-animation-layer {
       @media (prefers-reduced-motion: no-preference) {
         @supports (animation-timeline: view()) {
@@ -104,7 +104,7 @@
     }
   }
 
-  @layer demo.support {
+  @layer host {
     :host {
       display: grid;
       place-content: end center;
