@@ -8,8 +8,29 @@
       bgImage: { attribute: "image", type: "String" },
       bgImageAlt: { attribute: "image-alt", type: "String" },
     },
+    extend: (BaseElement) =>
+      class extends BaseElement {
+        connectedCallback() {
+          super.connectedCallback()
+
+          const root = this.shadowRoot
+          if (root && !root.querySelector("style[data-shared-tokens]")) {
+            const style = document.createElement("style")
+            style.setAttribute("data-shared-tokens", "")
+            style.textContent = sharedCss
+            root.prepend(style)
+          }
+        }
+      },
   }}
 />
+
+<script module>
+  import tokensCss from "./styles.css?inline"
+  import normalizeCss from "./normalize.min.css?inline"
+
+  const sharedCss = `${tokensCss}\n${normalizeCss}`
+</script>
 
 <script>
   import { onMount, onDestroy } from "svelte"
@@ -23,7 +44,7 @@
   } = $props()
 </script>
 
-<div class="masonry">
+<main>
   <div class="card-animation-layer">
     <article class="card">
       <img
@@ -642,18 +663,9 @@
       >
     </article>
   </div>
-</div>
+</main>
 
 <style>
-  @import "https://unpkg.com/open-props" layer(design.system);
-  @import "https://unpkg.com/open-props/normalize.min.css" layer(demo.support);
-  
-  :host {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
   @keyframes slide-in {
     from {
       scale: 0.85;
@@ -674,14 +686,14 @@
   }
 
   @layer demo.support {
-    body {
-      /* display: grid; */
+    :host {
+      display: grid;
       place-content: end center;
       padding: var(--size-5);
       gap: var(--size-5);
     }
 
-    .masonry {
+    main {
       --cols: 2;
       display: grid;
       grid-template-columns: repeat(
