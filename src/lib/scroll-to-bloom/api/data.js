@@ -1,8 +1,9 @@
 import { csv } from "d3-fetch"
 
-const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQo-OXqVYW_x9qJwWYt1XDE9BkmOKuY4EUTLCPnXLusy00g3EdvbDkg8QE4exYVY315S02Hnwz5vKrj/pub?gid=0&single=true&output=csv"
+// const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQo-OXqVYW_x9qJwWYt1XDE9BkmOKuY4EUTLCPnXLusy00g3EdvbDkg8QE4exYVY315S02Hnwz5vKrj/pub?gid=0&single=true&output=csv"
 
-export async function getData() {
+export async function getData(URL) {
+  if (!URL) throw new Error("Missing data URL")
   const data = await csv(URL)
   return data
   // const data = res.map( (row, index) => ({

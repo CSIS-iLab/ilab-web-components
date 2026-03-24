@@ -2,6 +2,7 @@
   customElement={{
     tag: "csis-scroll-to-bloom",
     props: {
+      dataURL: { attribute: "data-url", type: "String" },
       description: { attribute: "description", type: "String" },
       title: { attribute: "title", type: "String" },
       titleLink: { attribute: "title-link", type: "String" },
@@ -37,7 +38,8 @@
   import { getData } from "./api/data"
 
   let data = $state([])
-    let {
+  let {
+    dataURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQo-OXqVYW_x9qJwWYt1XDE9BkmOKuY4EUTLCPnXLusy00g3EdvbDkg8QE4exYVY315S02Hnwz5vKrj/pub?gid=0&single=true&output=csv",
     description = "Bacon ipsum dolor amet pariatur do ribeye, tri-tip aliqua pig brisket in pork chop proident salami.",
     title = "Bacon ipsum dolor",
     titleLink = "https://baconipsum.com",
@@ -46,13 +48,20 @@
   } = $props()
 
   onMount(async () => {
-    data = await getData()
+    if (!dataURL) return
+    try {
+      data = await getData(dataURL)
+    } catch (error) {
+      console.error("Error fetching data: ", error)
+    }
   })
   // $inspect(data)
 </script>
 
 <header>
-  <h1><a href="{titleLink}" target="_blank" rel="noopener noreferrer">{title}</a></h1>
+  <h1>
+    <a href={titleLink} target="_blank" rel="noopener noreferrer">{title}</a>
+  </h1>
   <p>{description}</p>
   <img src={bgImage} alt={bgImageAlt} />
 </header>
