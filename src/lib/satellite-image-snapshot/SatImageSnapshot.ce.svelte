@@ -128,7 +128,6 @@
 <style>
   :host {
     display: block;
-    width: 100%;
     color: #111;
     font-family: Arial, sans-serif;
   }
@@ -136,8 +135,14 @@
   .snapshot-timeline {
     display: grid;
     gap: 1.5rem;
-    /* width: 100%; */
     height: 100vh;
+  }
+
+  .snapshot-media {
+    display: block;
+    max-width: 900px;
+    margin-inline: auto;
+    height: 40vh;
   }
 
   .snapshot-media figure {
@@ -147,10 +152,10 @@
   .snapshot-media img {
     display: block;
     width: 100%;
-    max-width: 900px;
     margin-inline: auto;
     height: auto;
-    object-fit: cover;
+    object-fit: contain;
+    aspect-ratio: 16/9;
   }
 
   .timeline-bar {
@@ -158,11 +163,15 @@
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 1rem;
+    max-width: 900px;
+    width: 100%;
+    height: 10vh;
+    margin-inline: auto;
   }
 
   .timeline-track-wrap {
     position: relative;
-    min-height: 5rem;
+    min-height: 3rem;
     padding-block: 1.5rem 2.5rem;
   }
 
@@ -176,7 +185,6 @@
   }
 
   .timeline-track {
-    width: 100%;
     background: #d9d9d9;
   }
 
@@ -271,8 +279,10 @@
 
   .snapshot-content {
     max-width: 900px;
+    width: 100%;
     margin-inline: auto;
     text-align: left;
+    height: 45vh;
   }
 
   .snapshot-content h2 {
