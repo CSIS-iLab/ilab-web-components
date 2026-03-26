@@ -256,27 +256,29 @@
   .snapshot-timeline {
     display: grid;
     gap: 1.5rem;
-    height: 100vh;
+    /* height: 100vh; */
   }
 
   .snapshot-media {
     display: block;
     max-width: 900px;
+    width: 100%;
     margin-inline: auto;
-    height: 40vh;
+    height: 60vh;
+    overflow: hidden;
   }
 
   .snapshot-media figure {
     margin: 0;
+    width: 100%;
+    height: 100%;
   }
 
   .snapshot-media img {
     display: block;
     width: 100%;
-    margin-inline: auto;
-    height: auto;
+    height: 100%;
     object-fit: contain;
-    aspect-ratio: 16/9;
   }
 
   .timeline-bar {
@@ -451,7 +453,10 @@
     width: 100%;
     margin-inline: auto;
     text-align: left;
-    height: 45vh;
+    height: 15vh;
+    background-color: #ccc;
+    border-radius: 0.5rem;
+    padding: 3rem 1rem;
   }
 
   .snapshot-content h2 {
