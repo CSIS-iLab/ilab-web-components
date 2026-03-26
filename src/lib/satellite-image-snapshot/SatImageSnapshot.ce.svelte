@@ -165,7 +165,7 @@
           height="24px"
           viewBox="0 -960 960 960"
           width="24px"
-          fill="#e3e3e3"
+          // fill="#e3e3e3"
           ><path
             d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"
           /></svg
@@ -230,7 +230,7 @@
           height="24px"
           viewBox="0 -960 960 960"
           width="24px"
-          fill="#e3e3e3"
+          // fill="#e3e3e3"
           ><path
             d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"
           /></svg
@@ -383,7 +383,7 @@
   }
 
   .timeline-point button.selected .dot {
-    border-color: #111;
+    border-color: #DD3D3D;
     transform: scale(1.1);
   }
 
@@ -419,24 +419,25 @@
     align-items: center;
     gap: 0.5rem;
     background-color: hsl(0 0% 50% / 0.15);
-    border: 1px solid hsl(0, 0%, 90%);
+    border: 1px solid #DD3D3D;
     border-radius: 0.25rem;
     transition: background 0.5s;
     cursor: pointer;
 
     &:is(:hover, :focus-visible) {
       background: hsl(0 0% 50% / 0.05);
+      color: #DD3D3D;
     }
   }
 
   button svg {
-    fill: light-dark(black, white);
+    fill: #DD3D3D;
     inline-size: 1em;
     block-size: 1em;
   }
   .nav-btn {
     appearance: none;
-    border: 1px solid #ccc;
+    border: 1px solid #DD3D3D;
     background: white;
     padding: 0.5rem 0.75rem;
     cursor: pointer;
