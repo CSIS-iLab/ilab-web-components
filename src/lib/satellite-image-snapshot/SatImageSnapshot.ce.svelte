@@ -6,6 +6,8 @@
       btnColor: { attribute: "btn-color", type: "String" },
       btnBgColor: { attribute: "btn-bg-color", type: "String" },
       btnBorderColor: { attribute: "btn-border-color", type: "String" },
+      btnBorderThickness: { attribute: "btn-border-thickness", type: "String"},
+      btnSVGColor: { attribute: "btn-svg-color", type: "String" },
       btnHoverColor: { attribute: "btn-hover-color", type: "String" },
       btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
       timelineLineColor: { attribute: "timeline-line-color", type: "String" },
@@ -61,8 +63,11 @@
     btnColor = "#ccc",
     btnBgColor = "#fff",
     btnBorderColor = "#DD3D3D",
+    btnBorderThickness = "1px",
+    btnSVGColor = "#DD3D3D",
     btnHoverColor = "hsl(0 0% 50% / 0.05)",
     btnBgHoverColor = "white",
+    timelineLineColor = "#d9d9d9",
 
   } = $props()
 
@@ -198,8 +203,11 @@
       --btn-color: ${btnColor};
       --btn-bg-color: ${btnBgColor};
       --btn-border-color: ${btnBorderColor};
+      --btn-border-thickness: ${btnBorderThickness};
+      --btn-svg-color: ${btnSVGColor};
       --btn-hover-color: ${btnHoverColor};
       --btn-bg-hover-color: ${btnBgHoverColor};
+      --timeline-line-color: ${timelineLineColor};
     `}
   >
     <div class="snapshot-media">
@@ -390,7 +398,7 @@
     position: absolute;
     top: 50%;
     height: 4px;
-    background: #d9d9d9;
+    background: var(--timeline-line-color,#d9d9d9);
     transform: translateY(-50%);
     border-radius: 999px;
     z-index: 0;
@@ -434,6 +442,11 @@
       border-color 0.2s ease;
     position: relative;
     z-index: 2;
+
+    &:is(:hover, :focus-visible) {
+      background: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
+      color: var(--btn-hover-color, #dd3d3d);
+    }
   }
 
   .timeline-point button.selected .dot {
@@ -479,22 +492,28 @@
     transition: background 0.5s;
     cursor: pointer;
 
-    &:is(:hover, :focus-visible) {
+    /* &:is(:hover, :focus-visible) {
       background: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
       color: var(--btn-hover-color, #dd3d3d);
-    }
+    } */
   }
 
   button svg {
-    fill: #dd3d3d;
+    fill: var(--btn-svg-color,#dd3d3d);
     inline-size: 1em;
     block-size: 1em;
   }
   .nav-btn {
     appearance: none;
+    border: var(--btn-border-thickness) solid var(--btn-border-color, #DD3D3D);
+    background-color: var(--btn-bg-color, purple);
     padding: 0.5rem 0.75rem;
     cursor: pointer;
     font: inherit;
+    &:is(:hover, :focus-visible) {
+      background-color: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
+      color: var(--btn-hover-color, #dd3d3d);
+    }
   }
 
   .nav-btn:disabled {
