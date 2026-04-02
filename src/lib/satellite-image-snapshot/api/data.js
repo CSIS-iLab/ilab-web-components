@@ -26,6 +26,7 @@ export async function getData(URL) {
         date: dateString,
         timestamp,
         dateText: formatDateText(dateString),
+        year: new Date(`${dateString}T00:00:00`).getFullYear(),
         imageLink: row.image?.trim() || "",
         imageAlt: row.image_alt?.trim() || "",
       }

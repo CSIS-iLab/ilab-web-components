@@ -3,6 +3,43 @@
     tag: "csis-satellite-snapshot",
     props: {
       dataURL: { attribute: "data-url", type: "String" },
+      btnColor: { attribute: "btn-color", type: "String" },
+      btnBgColor: { attribute: "btn-bg-color", type: "String" },
+      btnBorderColor: { attribute: "btn-border-color", type: "String" },
+      btnHoverColor: { attribute: "btn-hover-color", type: "String" },
+      btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
+      timelineLineColor: { attribute: "timeline-line-color", type: "String" },
+      titleColor: { attribute: "title-color", type: "String" },
+      titleAlignment: { attribute: "title-alignment", type: "String" },
+      titleFontSize: { attribute: "title-font-size", type: "String" },
+      dateColor: { attribute: "date-color", type: "String" },
+      dateFontSize: { attribute: "date-font-size", type: "String" },
+      descriptionColor: { attribute: "description-color", type: "String" },
+      descriptionAlignment: {
+        attribute: "description-alignment",
+        type: "String",
+      },
+      descriptionFontSize: {
+        attribute: "description-font-size",
+        type: "String",
+      },
+      textBoxColor: { attribute: "text-box-color", type: "String" },
+      textBoxBgColor: {
+        attribute: "text-box-background-color",
+        type: "String",
+      },
+      textBoxBorderThickness: {
+        attribute: "text-box-border-thickness",
+        type: "String",
+      },
+      textBoxBorderColor: {
+        attribute: "text-box-border-color",
+        type: "String",
+      },
+      textBoxBorderRadius: {
+        attribute: "text-box-border-radius",
+        type: "String",
+      },
     },
   }}
 />
@@ -19,7 +56,17 @@
   let timelineShell = $state()
   let scrollLeft = $state(0)
 
-  let { dataURL = "" } = $props()
+  let {
+    dataURL = "",
+    btnColor = "#ccc",
+    btnBgColor = "#fff",
+    btnBorderColor = "#DD3D3D",
+    btnHoverColor = "hsl(0 0% 50% / 0.05)",
+    btnBgHoverColor = "white",
+
+  } = $props()
+
+  let container = $state()
 
   const EDGE_PAD = 56
   const MIN_GAP_PX = 56
@@ -145,7 +192,16 @@
 </script>
 
 {#if selectedItem}
-  <section class="snapshot-timeline">
+  <section
+    class="snapshot-timeline"
+    style={`
+      --btn-color: ${btnColor};
+      --btn-bg-color: ${btnBgColor};
+      --btn-border-color: ${btnBorderColor};
+      --btn-hover-color: ${btnHoverColor};
+      --btn-bg-hover-color: ${btnBgHoverColor};
+    `}
+  >
     <div class="snapshot-media">
       <figure>
         <img src={selectedItem.imageLink} alt={selectedItem.imageAlt} />
@@ -165,7 +221,6 @@
           height="24px"
           viewBox="0 -960 960 960"
           width="24px"
-          // fill="#e3e3e3"
           ><path
             d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"
           /></svg
@@ -208,7 +263,7 @@
                     onfocus={() => handleEnter(index)}
                     onblur={handleLeave}
                   >
-                    <span class="dot"></span>
+                    <span class="dot">{selectedItem.year}</span>
                   </button>
                 </li>
               {/each}
@@ -230,7 +285,6 @@
           height="24px"
           viewBox="0 -960 960 960"
           width="24px"
-          // fill="#e3e3e3"
           ><path
             d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"
           /></svg
@@ -383,7 +437,7 @@
   }
 
   .timeline-point button.selected .dot {
-    border-color: #DD3D3D;
+    border-color: #dd3d3d;
     transform: scale(1.1);
   }
 
@@ -418,27 +472,26 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: hsl(0 0% 50% / 0.15);
-    border: 1px solid #DD3D3D;
+    color: var(--btn-color, hsl(0 0% 50% / 0.15));
+    background-color: var(--btn-bg-color, hsl(0 0% 50% / 0.15));
+    border: 1px solid var(--btn-border-color, #dd3d3d);
     border-radius: 0.25rem;
     transition: background 0.5s;
     cursor: pointer;
 
     &:is(:hover, :focus-visible) {
-      background: hsl(0 0% 50% / 0.05);
-      color: #DD3D3D;
+      background: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
+      color: var(--btn-hover-color, #dd3d3d);
     }
   }
 
   button svg {
-    fill: #DD3D3D;
+    fill: #dd3d3d;
     inline-size: 1em;
     block-size: 1em;
   }
   .nav-btn {
     appearance: none;
-    border: 1px solid #DD3D3D;
-    background: white;
     padding: 0.5rem 0.75rem;
     cursor: pointer;
     font: inherit;
