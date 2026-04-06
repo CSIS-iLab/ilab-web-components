@@ -14,7 +14,7 @@
       titleColor: { attribute: "title-color", type: "String" },
       titleAlignment: { attribute: "title-alignment", type: "String" },
       titleFontSize: { attribute: "title-font-size", type: "String" },
-      dateColor: { attribute: "date-color", type: "String" },
+      dateFontColor: { attribute: "date-font-color", type: "String" },
       dateFontSize: { attribute: "date-font-size", type: "String" },
       descriptionColor: { attribute: "description-color", type: "String" },
       descriptionAlignment: {
@@ -71,6 +71,8 @@
     titleColor = "#000",
     titleAlignment = "left",
     titleFontSize = "1.5rem",
+    dateFontColor = "#000",
+    dateFontSize = "1rem",
   } = $props()
 
   let container = $state()
@@ -213,6 +215,8 @@
       --title-color: ${titleColor};
       --title-alignment: ${titleAlignment};
       --title-font-size: ${titleFontSize};
+      --date-font-size: ${dateFontSize};
+      --date-font-color: ${dateFontColor};
     `}
   >
     <div class="snapshot-media">
@@ -547,8 +551,9 @@
   .snapshot-content em {
     display: block;
     margin-bottom: 0.75rem;
-    color: #666;
+    color: var(--date-font-color,#666);
     font-style: italic;
+    font-size: var(--date-font-size, 1rem);
   }
 
   .snapshot-content p {
