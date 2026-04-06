@@ -68,7 +68,9 @@
     btnHoverColor = "hsl(0 0% 50% / 0.05)",
     btnBgHoverColor = "white",
     timelineLineColor = "#d9d9d9",
-
+    titleColor = "#000",
+    titleAlignment = "left",
+    titleFontSize = "1.5rem",
   } = $props()
 
   let container = $state()
@@ -208,6 +210,9 @@
       --btn-hover-color: ${btnHoverColor};
       --btn-bg-hover-color: ${btnBgHoverColor};
       --timeline-line-color: ${timelineLineColor};
+      --title-color: ${titleColor};
+      --title-alignment: ${titleAlignment};
+      --title-font-size: ${titleFontSize};
     `}
   >
     <div class="snapshot-media">
@@ -533,8 +538,10 @@
   }
 
   .snapshot-content h2 {
+    color: var(--title-color, black);
     margin: 0 0 0.5rem;
-    font-size: 1.5rem;
+    font-size: var(--title-font-size, 1.5rem);
+    text-align: var(--title-alignment, left);
   }
 
   .snapshot-content em {
