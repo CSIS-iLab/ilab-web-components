@@ -26,7 +26,6 @@
         attribute: "description-font-size",
         type: "String",
       },
-      textBoxColor: { attribute: "text-box-color", type: "String" },
       textBoxBgColor: {
         attribute: "text-box-background-color",
         type: "String",
@@ -78,6 +77,10 @@
     descriptionFontColor = "#000",
     descriptionFontSize = "1rem",
     descriptionAlignment = "left",
+    textBoxBgColor = "white",
+    textBoxBorderThickness = "2px",
+    textBoxBorderColor = "red",
+    textBoxBorderRadius = "15px",
   } = $props()
 
   let container = $state()
@@ -226,6 +229,10 @@
       --description-font-color: ${descriptionFontColor};
       --description-font-size: ${descriptionFontSize};
       --description-alignment: ${descriptionAlignment};
+      --text-box-bg-color:  ${textBoxBgColor};
+      --text-box-border-thickness: ${textBoxBorderThickness};
+      --text-box-border-color: ${textBoxBorderColor};
+      --text-box-border-radius: ${textBoxBorderRadius};
     `}
   >
     <div class="snapshot-media">
@@ -545,8 +552,9 @@
     margin-inline: auto;
     text-align: left;
     height: 15vh;
-    background-color: #ccc;
-    border-radius: 0.5rem;
+    background-color: var(--text-box-bg-color,#ccc);
+    border: var(--text-box-border-thickness, 2px) solid var(--text-box-border-color, transparent);
+    border-radius: var(--text-box-border-radius, 0.5rem);
     padding: 3rem 1rem;
   }
 
