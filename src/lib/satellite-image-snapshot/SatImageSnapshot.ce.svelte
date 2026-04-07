@@ -16,7 +16,8 @@
       titleFontSize: { attribute: "title-font-size", type: "String" },
       dateFontColor: { attribute: "date-font-color", type: "String" },
       dateFontSize: { attribute: "date-font-size", type: "String" },
-      descriptionColor: { attribute: "description-color", type: "String" },
+      dateAlignment: { attribute: "date-alignment", type: "String" },
+      descriptionFontColor: { attribute: "description-font-color", type: "String" },
       descriptionAlignment: {
         attribute: "description-alignment",
         type: "String",
@@ -73,6 +74,10 @@
     titleFontSize = "1.5rem",
     dateFontColor = "#000",
     dateFontSize = "1rem",
+    dateAlignment = "left",
+    descriptionFontColor = "#000",
+    descriptionFontSize = "1rem",
+    descriptionAlignment = "left",
   } = $props()
 
   let container = $state()
@@ -217,6 +222,10 @@
       --title-font-size: ${titleFontSize};
       --date-font-size: ${dateFontSize};
       --date-font-color: ${dateFontColor};
+      --date-alignment: ${dateAlignment};
+      --description-font-color: ${descriptionFontColor};
+      --description-font-size: ${descriptionFontSize};
+      --description-alignment: ${descriptionAlignment};
     `}
   >
     <div class="snapshot-media">
@@ -554,11 +563,15 @@
     color: var(--date-font-color,#666);
     font-style: italic;
     font-size: var(--date-font-size, 1rem);
+    text-align: var(--date-alignment, left);
   }
 
   .snapshot-content p {
     margin: 0;
     line-height: 1.5;
+    color: var(--description-font-color, black);
+    font-size: var(--description-font-size, 1.5rem);
+    text-align: var(--description-alignment, left);
   }
 
   @media (prefers-reduced-motion: no-preference) {
