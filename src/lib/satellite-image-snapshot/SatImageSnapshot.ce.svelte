@@ -578,7 +578,7 @@
     max-width: 900px;
     width: 100%;
     margin-inline: auto;
-    text-align: left;
+    /* text-align: left; */
     /* height: 15vh; */
     background-color: var(--text-box-bg-color,#ccc);
     border: var(--text-box-border-thickness, 2px) solid var(--text-box-border-color, transparent);
