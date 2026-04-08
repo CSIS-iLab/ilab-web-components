@@ -11,6 +11,10 @@
       btnHoverColor: { attribute: "btn-hover-color", type: "String" },
       btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
       timelineLineColor: { attribute: "timeline-line-color", type: "String" },
+      timelineCircleColor: { attribute: "timeline-circle-color", type: "String" },
+      timelineCircleBorderColor: { attribute: "timeline-circle-border-color", type: "String" },
+      timelineCircleSelectedBorderColor: { attribute: "timeline-circle-selected-border-color", type: "String" },
+      timelineYearColor: { attribute: "timeline-year-color", type: "String" },
       titleColor: { attribute: "title-color", type: "String" },
       titleAlignment: { attribute: "title-alignment", type: "String" },
       titleFontSize: { attribute: "title-font-size", type: "String" },
@@ -68,6 +72,10 @@
     btnHoverColor = "hsl(0 0% 50% / 0.05)",
     btnBgHoverColor = "white",
     timelineLineColor = "#d9d9d9",
+    timelineCircleColor = "#d9d9d9",
+    timelineCircleBorderColor = "#d9d9d9",
+    timelineCircleSelectedBorderColor = "#d9d9d9",
+    timelineYearColor = "#fff",
     titleColor = "#000",
     titleAlignment = "left",
     titleFontSize = "1.5rem",
@@ -220,6 +228,10 @@
       --btn-hover-color: ${btnHoverColor};
       --btn-bg-hover-color: ${btnBgHoverColor};
       --timeline-line-color: ${timelineLineColor};
+      --timeline-circle-color: ${timelineCircleColor};
+      --timeline-circle-border-color: ${timelineCircleBorderColor};
+      --timeline-circle-selected-border-color: ${timelineCircleSelectedBorderColor};
+      --timeline-year-color: ${timelineYearColor};
       --title-color: ${titleColor};
       --title-alignment: ${titleAlignment};
       --title-font-size: ${titleFontSize};
@@ -296,7 +308,8 @@
                     onfocus={() => handleEnter(index)}
                     onblur={handleLeave}
                   >
-                    <span class="dot">{selectedItem.year}</span>
+                    <span class="dot"></span>
+                    <span class="year">{selectedItem.year}</span>
                   </button>
                 </li>
               {/each}
@@ -368,114 +381,129 @@
     object-fit: contain;
   }
 
-  .timeline-bar {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 1rem;
-    max-width: 900px;
-    width: 100%;
-    height: 10vh;
-    margin-inline: auto;
-  }
+.timeline-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  max-width: 900px;
+  width: 100%;
+  height: 10vh;
+  margin-inline: auto;
+}
 
-  .timeline-shell {
-    position: relative;
-    min-width: 0;
-  }
+.timeline-shell {
+  position: relative;
+  min-width: 0;
+}
 
-  .timeline-tooltip {
-    position: absolute;
-    bottom: calc(100% + 0.5rem);
-    transform: translateX(-50%);
-    white-space: nowrap;
-    font-size: 0.8rem;
-    line-height: 1.2;
-    background: white;
-    border: 1px solid #ddd;
-    padding: 0.35rem 0.5rem;
-    border-radius: 0.375rem;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
-    z-index: 20;
-    pointer-events: none;
-  }
+.timeline-tooltip {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  background: white;
+  border: 1px solid #ddd;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+  z-index: 20;
+  pointer-events: none;
+}
 
-  .timeline-track-wrap {
-    position: relative;
-    min-height: 3rem;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-  }
+.timeline-track-wrap {
+  position: relative;
+  min-height: 3rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
 
-  .timeline-track-wrap::-webkit-scrollbar {
-    display: none;
-  }
+.timeline-track-wrap::-webkit-scrollbar {
+  display: none;
+}
 
-  .timeline-rail {
-    position: relative;
-    min-height: 3rem;
-    height: 3rem;
-  }
+.timeline-rail {
+  position: relative;
+  min-height: 3rem;
+  height: 3rem;
+}
 
-  .timeline-line {
-    position: absolute;
-    top: 50%;
-    height: 4px;
-    background: var(--timeline-line-color,#d9d9d9);
-    transform: translateY(-50%);
-    border-radius: 999px;
-    z-index: 0;
-  }
+.timeline-line {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  background: var(--timeline-line-color, #d9d9d9);
+  transform: translateY(-50%);
+  border-radius: 999px;
+  z-index: 0;
+}
 
-  .timeline-points {
-    position: relative;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    min-height: 3rem;
-  }
+.timeline-points {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 3rem;
+}
 
-  .timeline-point {
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
-  }
+.timeline-track-wrap,
+.timeline-rail,
+.timeline-points {
+  min-height: 4.5rem;
+}
 
-  .timeline-point button {
-    appearance: none;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-    padding: 0;
-    font: inherit;
-    color: inherit;
-    position: relative;
-  }
 
-  .dot {
-    display: block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: white;
-    border: 3px solid #999;
-    transition:
-      transform 0.2s ease,
-      border-color 0.2s ease;
-    position: relative;
-    z-index: 2;
+.timeline-point {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
 
-    &:is(:hover, :focus-visible) {
-      background: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
-      color: var(--btn-hover-color, #dd3d3d);
-    }
+.timeline-point button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  position: relative;
+  display: block;
+}
+
+.dot {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--timeline-circle-color, white);
+  border: 3px solid var(--timeline-circle-border-color, #999);
+  position: relative;
+  z-index: 2;
+  
+  &:is(:hover, :focus-visible) {
+    background: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
+    color: var(--btn-hover-color, #dd3d3d);
   }
+}
+
+.year {
+  position: absolute;
+  color: var(--timeline-year-color, gray);
+  top: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  line-height: 1;
+}
 
   .timeline-point button.selected .dot {
-    border-color: #dd3d3d;
+    border-color: var(--timeline-circle-selected-border-color, #dd3d3d);
     transform: scale(1.1);
   }
 
@@ -551,7 +579,7 @@
     width: 100%;
     margin-inline: auto;
     text-align: left;
-    height: 15vh;
+    /* height: 15vh; */
     background-color: var(--text-box-bg-color,#ccc);
     border: var(--text-box-border-thickness, 2px) solid var(--text-box-border-color, transparent);
     border-radius: var(--text-box-border-radius, 0.5rem);
