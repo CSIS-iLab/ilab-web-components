@@ -352,6 +352,11 @@
     color: #111;
     font-family: Arial, sans-serif;
   }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
   .snapshot-timeline {
     display: grid;
@@ -583,7 +588,7 @@
     background-color: var(--text-box-bg-color,#ccc);
     border: var(--text-box-border-thickness, 2px) solid var(--text-box-border-color, transparent);
     border-radius: var(--text-box-border-radius, 0.5rem);
-    padding: 3rem 1rem;
+    padding: 1rem 1rem;
   }
 
   .snapshot-content h2 {
@@ -616,22 +621,54 @@
     }
   }
 
-  @media (max-width: 700px) {
-    .timeline-bar {
-      grid-template-columns: 1fr;
-      height: auto;
-    }
-
-    .nav-btn {
-      justify-self: start;
-    }
-
-    .snapshot-media {
-      height: auto;
-    }
-
-    .snapshot-content {
-      height: auto;
-    }
+@media (max-width: 700px) {
+  .snapshot-timeline {
+    gap: 1rem;
   }
+
+  .snapshot-media {
+    height: 50vw; /* responsive height instead of auto */
+    min-height: 200px;
+  }
+
+  .snapshot-content {
+    height: auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Stack the timeline bar vertically, centering everything */
+  .timeline-bar {
+    grid-template-columns: 1fr 1fr; /* two equal columns for the buttons */
+    grid-template-rows: auto auto;  /* two rows: buttons, then timeline */
+    height: auto;
+    justify-items: center;
+  }
+
+  /* Hide the scrollable timeline on mobile */
+  /* Timeline spans both columns, sits in row 1 */
+  .timeline-shell {
+    grid-column: 1 / -1;  /* span full width */
+    grid-row: 1;
+    width: 100%;           /* fill the available space */
+  }
+
+  /* Prev button moves to row 2, left column */
+  .nav-btn.left {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: end;
+    padding-right: 1.5rem;
+  }
+
+  /* Next button moves to row 2, right column */
+  .nav-btn.right {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    padding-left: 1.5rem;
+  }
+}
+
+
 </style>
