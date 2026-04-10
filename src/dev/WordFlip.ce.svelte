@@ -71,7 +71,6 @@
   export let prefixText = "I build";
   export let items =
     '["products.","platforms.","web applications.","interfaces.","design systems."]';
-  export let startIndex = 0;
   export let animate = "true";
   export let startHue = 25;
   export let endHue = 100;
@@ -90,8 +89,9 @@
     if (!itemEls.length) return;
 
     const viewportCenter = window.innerHeight / 2;
+    const lastIndex = itemEls.length - 1;
 
-    let closestIndex = 0;
+    let closestIndex = -1;
     let closestDistance = Infinity;
 
     itemEls.forEach((item, index) => {
@@ -105,7 +105,19 @@
       }
     });
 
-    activeIndex = closestIndex;
+    const threshold = itemEls[0].getBoundingClientRect().height * 0.35;
+
+    const lastRect = itemEls[lastIndex].getBoundingClientRect();
+    const lastCenter = lastRect.top + lastRect.height / 2;
+
+    // Once the last item reaches or passes the center line,
+    // keep it highlighted.
+    if (lastCenter <= viewportCenter) {
+      activeIndex = lastIndex;
+      return;
+    }
+
+    activeIndex = closestDistance <= threshold ? closestIndex : -1;
   }
 
   function parseItems(value) {
@@ -336,11 +348,6 @@
   .word-flip[data-animate="true"] .word-flip__list li.is-active {
     opacity: 1;
     filter: brightness(1.15);
-  }
-
-  .word-flip[data-animate="true"] .word-flip__list li.is-before,
-  .word-flip[data-animate="true"] .word-flip__list li.is-after {
-    opacity: 0.45;
   }
 
   @keyframes brighten {
