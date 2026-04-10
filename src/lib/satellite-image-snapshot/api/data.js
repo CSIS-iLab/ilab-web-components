@@ -33,6 +33,10 @@ export async function getData(URL) {
     })
     .filter((item) => item.date && !Number.isNaN(item.timestamp))
     .sort((a, b) => a.timestamp - b.timestamp)
+    .map((item, index, arr) => ({        // second map, after sort
+      ...item,
+      isNewYear: index === 0 || item.year !== arr[index - 1].year,
+    }))
 
   return data
 }
