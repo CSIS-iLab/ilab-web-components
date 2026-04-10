@@ -6,14 +6,23 @@
       btnColor: { attribute: "btn-color", type: "String" },
       btnBgColor: { attribute: "btn-bg-color", type: "String" },
       btnBorderColor: { attribute: "btn-border-color", type: "String" },
-      btnBorderThickness: { attribute: "btn-border-thickness", type: "String"},
+      btnBorderThickness: { attribute: "btn-border-thickness", type: "String" },
       btnSVGColor: { attribute: "btn-svg-color", type: "String" },
       btnHoverColor: { attribute: "btn-hover-color", type: "String" },
       btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
       timelineLineColor: { attribute: "timeline-line-color", type: "String" },
-      timelineCircleColor: { attribute: "timeline-circle-color", type: "String" },
-      timelineCircleBorderColor: { attribute: "timeline-circle-border-color", type: "String" },
-      timelineCircleSelectedBorderColor: { attribute: "timeline-circle-selected-border-color", type: "String" },
+      timelineCircleColor: {
+        attribute: "timeline-circle-color",
+        type: "String",
+      },
+      timelineCircleBorderColor: {
+        attribute: "timeline-circle-border-color",
+        type: "String",
+      },
+      timelineCircleSelectedBorderColor: {
+        attribute: "timeline-circle-selected-border-color",
+        type: "String",
+      },
       timelineYearColor: { attribute: "timeline-year-color", type: "String" },
       titleColor: { attribute: "title-color", type: "String" },
       titleAlignment: { attribute: "title-alignment", type: "String" },
@@ -21,7 +30,10 @@
       dateFontColor: { attribute: "date-font-color", type: "String" },
       dateFontSize: { attribute: "date-font-size", type: "String" },
       dateAlignment: { attribute: "date-alignment", type: "String" },
-      descriptionFontColor: { attribute: "description-font-color", type: "String" },
+      descriptionFontColor: {
+        attribute: "description-font-color",
+        type: "String",
+      },
       descriptionAlignment: {
         attribute: "description-alignment",
         type: "String",
@@ -309,7 +321,10 @@
                     onblur={handleLeave}
                   >
                     <span class="dot"></span>
-                    <span class="year">{selectedItem.year}</span>
+                    {#if item.isNewYear}
+                      <span class="year-tick"></span>
+                      <span class="year">{item.year}</span>
+                    {/if}
                   </button>
                 </li>
               {/each}
@@ -386,125 +401,136 @@
     object-fit: contain;
   }
 
-.timeline-bar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 1rem;
-  max-width: 900px;
-  width: 100%;
-  height: 10vh;
-  margin-inline: auto;
-}
-
-.timeline-shell {
-  position: relative;
-  min-width: 0;
-}
-
-.timeline-tooltip {
-  position: absolute;
-  bottom: calc(100% + 0.5rem);
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-size: 0.8rem;
-  line-height: 1.2;
-  background: white;
-  border: 1px solid #ddd;
-  padding: 0.35rem 0.5rem;
-  border-radius: 0.375rem;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
-  z-index: 20;
-  pointer-events: none;
-}
-
-.timeline-track-wrap {
-  position: relative;
-  min-height: 3rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-}
-
-.timeline-track-wrap::-webkit-scrollbar {
-  display: none;
-}
-
-.timeline-rail {
-  position: relative;
-  min-height: 3rem;
-  height: 3rem;
-}
-
-.timeline-line {
-  position: absolute;
-  top: 50%;
-  height: 4px;
-  background: var(--timeline-line-color, #d9d9d9);
-  transform: translateY(-50%);
-  border-radius: 999px;
-  z-index: 0;
-}
-
-.timeline-points {
-  position: relative;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  min-height: 3rem;
-}
-
-.timeline-track-wrap,
-.timeline-rail,
-.timeline-points {
-  min-height: 4.5rem;
-}
-
-
-.timeline-point {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-}
-
-.timeline-point button {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 0;
-  font: inherit;
-  color: inherit;
-  position: relative;
-  display: block;
-}
-
-.dot {
-  display: block;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--timeline-circle-color, white);
-  border: 3px solid var(--timeline-circle-border-color, #999);
-  position: relative;
-  z-index: 2;
-  
-  &:is(:hover, :focus-visible) {
-    background: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
-    color: var(--btn-hover-color, #dd3d3d);
+  .timeline-bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    max-width: 900px;
+    width: 100%;
+    height: 10vh;
+    margin-inline: auto;
   }
+
+  .timeline-shell {
+    position: relative;
+    min-width: 0;
+  }
+
+  .timeline-tooltip {
+    position: absolute;
+    bottom: calc(100% + 0.5rem);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.8rem;
+    line-height: 1.2;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 0.35rem 0.5rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  .timeline-track-wrap {
+    position: relative;
+    min-height: 3rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .timeline-track-wrap::-webkit-scrollbar {
+    display: none;
+  }
+
+  .timeline-rail {
+    position: relative;
+    min-height: 3rem;
+    height: 3rem;
+  }
+
+  .timeline-line {
+    position: absolute;
+    top: 50%;
+    height: 4px;
+    background: var(--timeline-line-color, #d9d9d9);
+    transform: translateY(-50%);
+    border-radius: 999px;
+    z-index: 0;
+  }
+
+  .timeline-points {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-height: 3rem;
+  }
+
+  .timeline-track-wrap,
+  .timeline-rail,
+  .timeline-points {
+    min-height: 4.5rem;
+  }
+
+  .timeline-point {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+
+  .timeline-point button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    position: relative;
+    display: block;
+  }
+
+  .dot {
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--timeline-circle-color, white);
+    border: 3px solid var(--timeline-circle-border-color, #999);
+    position: relative;
+    z-index: 2;
+
+    &:is(:hover, :focus-visible) {
+      background: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
+      color: var(--btn-hover-color, #dd3d3d);
+    }
+  }
+
+.year-tick {
+  display: block;
+  width: 2px;
+  height: 10px;
+  background: var(--timeline-year-color, gray);
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .year {
   position: absolute;
   color: var(--timeline-year-color, gray);
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 1.1rem); /* pushed down below the tick */
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
   line-height: 1;
+  font-size: 0.75rem;
 }
 
   .timeline-point button.selected .dot {
@@ -557,13 +583,13 @@
   }
 
   button svg {
-    fill: var(--btn-svg-color,#dd3d3d);
+    fill: var(--btn-svg-color, #dd3d3d);
     inline-size: 1em;
     block-size: 1em;
   }
   .nav-btn {
     appearance: none;
-    border: var(--btn-border-thickness) solid var(--btn-border-color, #DD3D3D);
+    border: var(--btn-border-thickness) solid var(--btn-border-color, #dd3d3d);
     background-color: var(--btn-bg-color, purple);
     padding: 0.5rem 0.75rem;
     cursor: pointer;
@@ -585,8 +611,9 @@
     margin-inline: auto;
     /* text-align: left; */
     /* height: 15vh; */
-    background-color: var(--text-box-bg-color,#ccc);
-    border: var(--text-box-border-thickness, 2px) solid var(--text-box-border-color, transparent);
+    background-color: var(--text-box-bg-color, #ccc);
+    border: var(--text-box-border-thickness, 2px) solid
+      var(--text-box-border-color, transparent);
     border-radius: var(--text-box-border-radius, 0.5rem);
     padding: 1rem 1rem;
   }
@@ -601,7 +628,7 @@
   .snapshot-content em {
     display: block;
     margin-bottom: 0.75rem;
-    color: var(--date-font-color,#666);
+    color: var(--date-font-color, #666);
     font-style: italic;
     font-size: var(--date-font-size, 1rem);
     text-align: var(--date-alignment, left);
@@ -621,54 +648,52 @@
     }
   }
 
-@media (max-width: 700px) {
-  .snapshot-timeline {
-    gap: 1rem;
+  @media (max-width: 700px) {
+    .snapshot-timeline {
+      gap: 1rem;
+    }
+
+    .snapshot-media {
+      height: 50vw; /* responsive height instead of auto */
+      min-height: 200px;
+    }
+
+    .snapshot-content {
+      height: auto;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    /* Stack the timeline bar vertically, centering everything */
+    .timeline-bar {
+      grid-template-columns: 1fr 1fr; /* two equal columns for the buttons */
+      grid-template-rows: auto auto; /* two rows: buttons, then timeline */
+      height: auto;
+      justify-items: center;
+    }
+
+    /* Hide the scrollable timeline on mobile */
+    /* Timeline spans both columns, sits in row 1 */
+    .timeline-shell {
+      grid-column: 1 / -1; /* span full width */
+      grid-row: 1;
+      width: 100%; /* fill the available space */
+    }
+
+    /* Prev button moves to row 2, left column */
+    .nav-btn.left {
+      grid-column: 1;
+      grid-row: 2;
+      justify-self: end;
+      padding-right: 1.5rem;
+    }
+
+    /* Next button moves to row 2, right column */
+    .nav-btn.right {
+      grid-column: 2;
+      grid-row: 2;
+      justify-self: start;
+      padding-left: 1.5rem;
+    }
   }
-
-  .snapshot-media {
-    height: 50vw; /* responsive height instead of auto */
-    min-height: 200px;
-  }
-
-  .snapshot-content {
-    height: auto;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  /* Stack the timeline bar vertically, centering everything */
-  .timeline-bar {
-    grid-template-columns: 1fr 1fr; /* two equal columns for the buttons */
-    grid-template-rows: auto auto;  /* two rows: buttons, then timeline */
-    height: auto;
-    justify-items: center;
-  }
-
-  /* Hide the scrollable timeline on mobile */
-  /* Timeline spans both columns, sits in row 1 */
-  .timeline-shell {
-    grid-column: 1 / -1;  /* span full width */
-    grid-row: 1;
-    width: 100%;           /* fill the available space */
-  }
-
-  /* Prev button moves to row 2, left column */
-  .nav-btn.left {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: end;
-    padding-right: 1.5rem;
-  }
-
-  /* Next button moves to row 2, right column */
-  .nav-btn.right {
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: start;
-    padding-left: 1.5rem;
-  }
-}
-
-
 </style>
