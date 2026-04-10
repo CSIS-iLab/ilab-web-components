@@ -16,10 +16,6 @@
         type: "Number",
         reflect: true,
       },
-      snap: {
-        type: "Boolean",
-        reflect: true,
-      },
       animate: {
         type: "Boolean",
         reflect: true,
@@ -84,7 +80,6 @@
   export let items =
     '["products.","platforms.","web applications.","interfaces.","design systems."]';
   export let startIndex = 0;
-  export let snap = true;
   export let animate = true;
   export let startHue = 25;
   export let endHue = 100;
@@ -186,7 +181,7 @@
     );
     const target = itemEls[clampedIndex];
 
-    if (target && snap) {
+    if (target) {
       requestAnimationFrame(() => {
         const offset =
           target.offsetTop - rootEl.clientHeight / 2 + target.clientHeight / 2;
@@ -211,7 +206,6 @@
 <section
   class="word-flip"
   bind:this={rootEl}
-  data-snap={snap}
   data-animate={animate}
   style:--wf-text-color={textColor}
   style:--wf-background-color={backgroundColor}
