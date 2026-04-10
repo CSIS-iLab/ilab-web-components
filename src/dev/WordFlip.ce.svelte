@@ -17,7 +17,7 @@
         reflect: true,
       },
       animate: {
-        type: "Boolean",
+        type: "String",
         reflect: true,
       },
       startHue: {
@@ -64,13 +64,15 @@
 
   let rootEl;
   let listEl;
+  let itemEls = [];
+  let activeIndex = -1;
   let hasMounted = false;
 
   export let prefixText = "I build";
   export let items =
     '["products.","platforms.","web applications.","interfaces.","design systems."]';
   export let startIndex = 0;
-  export let animate = true;
+  export let animate = "true";
   export let startHue = 25;
   export let endHue = 100;
   export let textColor = "#ffffff";
@@ -80,6 +82,31 @@
   export let lineHeight = "1.25";
 
   let parsedItems = [];
+
+  function updateActiveItem() {
+    if (!listEl) return;
+
+    itemEls = Array.from(listEl.children);
+    if (!itemEls.length) return;
+
+    const viewportCenter = window.innerHeight / 2;
+
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    itemEls.forEach((item, index) => {
+      const rect = item.getBoundingClientRect();
+      const itemCenter = rect.top + rect.height / 2;
+      const distance = Math.abs(itemCenter - viewportCenter);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    activeIndex = closestIndex;
+  }
 
   function parseItems(value) {
     if (Array.isArray(value)) {
@@ -162,20 +189,6 @@
 
     rootEl.style.setProperty("--start", String(startHue));
     rootEl.style.setProperty("--end", String(endHue));
-
-    const clampedIndex = Math.max(
-      0,
-      Math.min(startIndex, parsedItems.length - 1),
-    );
-    const target = itemEls[clampedIndex];
-
-    if (target) {
-      requestAnimationFrame(() => {
-        const offset =
-          target.offsetTop - rootEl.clientHeight / 2 + target.clientHeight / 2;
-        rootEl.scrollTop = offset;
-      });
-    }
   }
 
   $: parsedItems = parseItems(items);
@@ -186,6 +199,19 @@
     hasMounted = true;
     if (fontUrl) loadFont(fontUrl);
     await syncListState();
+
+    updateActiveItem();
+
+    const handleScroll = () => {
+      if (animate === "true") updateActiveItem();
+    };
+
+    const handleResize = () => {
+      if (animate === "true") updateActiveItem();
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleResize);
   });
 
   $: srText = `${prefixText} ${parsedItems.join(" ")}`.trim();
@@ -194,7 +220,7 @@
 <section
   class="word-flip"
   bind:this={rootEl}
-  data-animate={animate}
+  data-animate={animate === "true" ? "true" : "false"}
   style:--wf-text-color={textColor}
   style:--wf-background-color={backgroundColor}
   style:--wf-font-family={fontFamily}
@@ -207,8 +233,14 @@
     </h2>
 
     <ul class="word-flip__list" bind:this={listEl}>
-      {#each parsedItems as item}
-        <li>{item}</li>
+      {#each parsedItems as item, index}
+        <li
+          class:is-active={animate === "true" && index === activeIndex}
+          class:is-before={animate === "true" && index === activeIndex - 1}
+          class:is-after={animate === "true" && index === activeIndex + 1}
+        >
+          {item}
+        </li>
       {/each}
     </ul>
   </div>
@@ -294,38 +326,35 @@
     color: var(--wf-text-color, #fff);
   }
 
-  @supports (animation-timeline: view()) and (animation-range: 0% 100%) {
-    .word-flip[data-animate="true"] .word-flip__list li {
-      opacity: 0.2;
-      animation-name: brighten;
-      animation-fill-mode: both;
-      animation-timing-function: linear;
-      animation-range: cover calc(50% - 1lh) calc(50% + 1lh);
-      animation-timeline: view();
+  .word-flip[data-animate="true"] .word-flip__list li {
+    opacity: 0.2;
+    transition:
+      opacity 180ms ease,
+      filter 180ms ease;
+  }
+
+  .word-flip[data-animate="true"] .word-flip__list li.is-active {
+    opacity: 1;
+    filter: brightness(1.15);
+  }
+
+  .word-flip[data-animate="true"] .word-flip__list li.is-before,
+  .word-flip[data-animate="true"] .word-flip__list li.is-after {
+    opacity: 0.45;
+  }
+
+  @keyframes brighten {
+    0% {
+      opacity: var(--start-opacity, 0.2);
     }
 
-    .word-flip[data-animate="true"] .word-flip__list li:first-child {
-      --start-opacity: 1;
+    50% {
+      opacity: 1;
+      filter: brightness(var(--brightness, 1.2));
     }
 
-    .word-flip[data-animate="true"] .word-flip__list li:last-child {
-      --end-opacity: 1;
-      --brightness: 1;
-    }
-
-    @keyframes brighten {
-      0% {
-        opacity: var(--start-opacity, 0.2);
-      }
-
-      50% {
-        opacity: 1;
-        filter: brightness(var(--brightness, 1.2));
-      }
-
-      100% {
-        opacity: var(--end-opacity, 0.2);
-      }
+    100% {
+      opacity: var(--end-opacity, 0.2);
     }
   }
 
