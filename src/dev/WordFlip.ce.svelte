@@ -50,16 +50,6 @@
         type: "String",
         reflect: true,
       },
-      maxWidth: {
-        attribute: "max-width",
-        type: "String",
-        reflect: true,
-      },
-      componentHeight: {
-        attribute: "component-height",
-        type: "String",
-        reflect: true,
-      },
       lineHeight: {
         attribute: "line-height",
         type: "String",
@@ -87,8 +77,6 @@
   export let backgroundColor = "#000000";
   export let fontFamily = "Inter, system-ui, sans-serif";
   export let fontUrl = "";
-  export let maxWidth = "900px";
-  export let componentHeight = "100vh";
   export let lineHeight = "1.25";
 
   let parsedItems = [];
@@ -210,8 +198,6 @@
   style:--wf-text-color={textColor}
   style:--wf-background-color={backgroundColor}
   style:--wf-font-family={fontFamily}
-  style:--wf-max-width={maxWidth}
-  style:--wf-component-height={componentHeight}
   style:--wf-line-height={lineHeight}
 >
   <div class="word-flip__inner">
