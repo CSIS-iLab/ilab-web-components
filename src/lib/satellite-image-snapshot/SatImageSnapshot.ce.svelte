@@ -10,7 +10,7 @@
       btnSVGColor: { attribute: "btn-svg-color", type: "String" },
       btnHoverColor: { attribute: "btn-hover-color", type: "String" },
       btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
-      tooltipFontSize: { attribute: "tooltip-font-size", type: "String"},
+      tooltipFontSize: { attribute: "tooltip-font-size", type: "String" },
       timelineLineColor: { attribute: "timeline-line-color", type: "String" },
       timelineCircleColor: {
         attribute: "timeline-circle-color",
@@ -25,6 +25,8 @@
         type: "String",
       },
       timelineYearColor: { attribute: "timeline-year-color", type: "String" },
+      boxFontUrl: { attribute: "box-font-url", type: "String" },
+      boxFontFamily: { attribute: "box-font-family", type: "String" },
       titleColor: { attribute: "title-color", type: "String" },
       titleAlignment: { attribute: "title-alignment", type: "String" },
       titleFontSize: { attribute: "title-font-size", type: "String" },
@@ -90,6 +92,8 @@
     timelineCircleBorderColor = "#d9d9d9",
     timelineCircleSelectedBorderColor = "#d9d9d9",
     timelineYearColor = "#fff",
+    boxFontUrl = "",
+    boxFontFamily = "'IBM Plex Sans', system-ui, sans-serif",
     titleColor = "#000",
     titleAlignment = "left",
     titleFontSize = "1.5rem",
@@ -132,6 +136,21 @@
       console.error("Error fetching data:", error)
     }
   })
+  /* -------------------- font loading -------------------- */
+  onMount(() => {
+    if (!boxFontUrl) return;
+
+    const existing = document.querySelector(
+      `link[data-csis-font="${boxFontUrl}"]`
+    );
+    if (existing) return;
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = boxFontUrl;
+    link.dataset.csisFont = boxFontUrl;
+    document.head.appendChild(link);
+  });
 
   const selectedItem = $derived(data[selectedIndex])
 
@@ -247,6 +266,7 @@
       --timeline-circle-border-color: ${timelineCircleBorderColor};
       --timeline-circle-selected-border-color: ${timelineCircleSelectedBorderColor};
       --timeline-year-color: ${timelineYearColor};
+      --box-font-family: ${boxFontFamily};
       --title-color: ${titleColor};
       --title-alignment: ${titleAlignment};
       --title-font-size: ${titleFontSize};
@@ -514,27 +534,27 @@
     }
   }
 
-.year-tick {
-  display: block;
-  width: 2px;
-  height: 10px;
-  background: var(--timeline-year-color, gray);
-  position: absolute;
-  top: calc(100% + 0.25rem);
-  left: 50%;
-  transform: translateX(-50%);
-}
+  .year-tick {
+    display: block;
+    width: 2px;
+    height: 10px;
+    background: var(--timeline-year-color, gray);
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 50%;
+    transform: translateX(-50%);
+  }
 
-.year {
-  position: absolute;
-  color: var(--timeline-year-color, gray);
-  top: calc(100% + 1.1rem); /* pushed down below the tick */
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  line-height: 1;
-  font-size: 0.75rem;
-}
+  .year {
+    position: absolute;
+    color: var(--timeline-year-color, gray);
+    top: calc(100% + 1.1rem); /* pushed down below the tick */
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    line-height: 1;
+    font-size: 0.75rem;
+  }
 
   .timeline-point button.selected .dot {
     border-color: var(--timeline-circle-selected-border-color, #dd3d3d);
@@ -609,6 +629,7 @@
   }
 
   .snapshot-content {
+    font-family: var(--box-font-family, 'IBM Plex Sans', system-ui, sans-serif);
     max-width: 900px;
     width: 100%;
     margin-inline: auto;
@@ -624,6 +645,7 @@
   .snapshot-content h2 {
     color: var(--title-color, black);
     margin: 0 0 0.5rem;
+    font-family: inherit;
     font-size: var(--title-font-size, 1.5rem);
     text-align: var(--title-alignment, left);
   }
@@ -632,7 +654,8 @@
     display: block;
     margin-bottom: 0.75rem;
     color: var(--date-font-color, #666);
-    font-style: normal ;
+    font-family: inherit;
+    font-style: normal;
     font-size: var(--date-font-size, 1rem);
     text-align: var(--date-alignment, left);
   }
@@ -641,6 +664,7 @@
     margin: 0;
     line-height: 1.5;
     color: var(--description-font-color, black);
+    font-family: inherit;
     font-size: var(--description-font-size, 1.5rem);
     text-align: var(--description-alignment, left);
   }
