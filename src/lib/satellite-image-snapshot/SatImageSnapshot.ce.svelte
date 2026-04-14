@@ -10,6 +10,7 @@
       btnSVGColor: { attribute: "btn-svg-color", type: "String" },
       btnHoverColor: { attribute: "btn-hover-color", type: "String" },
       btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
+      tooltipFontSize: { attribute: "tooltip-font-size", type: "String"},
       timelineLineColor: { attribute: "timeline-line-color", type: "String" },
       timelineCircleColor: {
         attribute: "timeline-circle-color",
@@ -83,6 +84,7 @@
     btnSVGColor = "#DD3D3D",
     btnHoverColor = "hsl(0 0% 50% / 0.05)",
     btnBgHoverColor = "white",
+    tooltipFontSize = ".8rem",
     timelineLineColor = "#d9d9d9",
     timelineCircleColor = "#d9d9d9",
     timelineCircleBorderColor = "#d9d9d9",
@@ -239,6 +241,7 @@
       --btn-svg-color: ${btnSVGColor};
       --btn-hover-color: ${btnHoverColor};
       --btn-bg-hover-color: ${btnBgHoverColor};
+      --tooltip-font-size: ${tooltipFontSize};
       --timeline-line-color: ${timelineLineColor};
       --timeline-circle-color: ${timelineCircleColor};
       --timeline-circle-border-color: ${timelineCircleBorderColor};
@@ -422,7 +425,7 @@
     bottom: calc(100% + 0.5rem);
     transform: translateX(-50%);
     white-space: nowrap;
-    font-size: 0.8rem;
+    font-size: var(--tooltip-font-size, 0.8rem);
     line-height: 1.2;
     background: white;
     border: 1px solid #ddd;
@@ -629,7 +632,7 @@
     display: block;
     margin-bottom: 0.75rem;
     color: var(--date-font-color, #666);
-    font-style: italic;
+    font-style: normal ;
     font-size: var(--date-font-size, 1rem);
     text-align: var(--date-alignment, left);
   }
