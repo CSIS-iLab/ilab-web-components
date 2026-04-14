@@ -445,7 +445,7 @@
     bottom: calc(100% + 0.5rem);
     transform: translateX(-50%);
     white-space: nowrap;
-    font-size: var(--tooltip-font-size, 0.8rem);
+    font-size: var(--tooltip-font-size);
     line-height: 1.2;
     background: white;
     border: 1px solid #ddd;
@@ -676,6 +676,9 @@
   }
 
   @media (max-width: 700px) {
+    .timeline-tooltip {
+      font-size: 0.8rem;
+    }
     .snapshot-timeline {
       gap: 1rem;
     }
