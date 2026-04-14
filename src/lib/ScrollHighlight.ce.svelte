@@ -66,7 +66,7 @@
   import { gsap } from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-  export let highlightStyle = "background"; // background | half | underline
+  export let highlightStyle = "full"; // background | half | underline
   export let highlightColor = "#ffe44d";
   export let textColor = "#24343a";
   export let activeTextColor = "#000";
@@ -168,9 +168,9 @@
   }
 
   function setInactiveStyles(el) {
+    el.style.backgroundColor = "transparent";
     el.style.backgroundRepeat = "no-repeat";
     el.style.backgroundImage = getBackgroundImage();
-    el.style.backgroundColor = "transparent";
     el.style.backgroundSize = "0% 100%";
     el.style.transition = [
       `color calc(${duration} / 4) cubic-bezier(0.25, 1, 0.5, 1)`,
