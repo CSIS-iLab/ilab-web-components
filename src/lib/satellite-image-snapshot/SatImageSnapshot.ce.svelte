@@ -12,6 +12,10 @@
       btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
       tooltipFontSize: { attribute: "tooltip-font-size", type: "String" },
       timelineLineColor: { attribute: "timeline-line-color", type: "String" },
+      timelineCircleSize: {
+        attribute: "timeline-circle-size",
+        type: "String",
+      },
       timelineCircleColor: {
         attribute: "timeline-circle-color",
         type: "String",
@@ -88,6 +92,7 @@
     btnBgHoverColor = "white",
     tooltipFontSize = ".8rem",
     timelineLineColor = "#d9d9d9",
+    timelineCircleSize = "1rem",
     timelineCircleColor = "#d9d9d9",
     timelineCircleBorderColor = "#d9d9d9",
     timelineCircleSelectedBorderColor = "#d9d9d9",
@@ -262,7 +267,7 @@
       --btn-bg-hover-color: ${btnBgHoverColor};
       --tooltip-font-size: ${tooltipFontSize};
       --timeline-line-color: ${timelineLineColor};
-      --timeline-circle-size: 26px;
+      --timeline-circle-size: ${timelineCircleSize};
       --timeline-circle-color: ${timelineCircleColor};
       --timeline-circle-border-color: ${timelineCircleBorderColor};
       --timeline-circle-selected-border-color: ${timelineCircleSelectedBorderColor};
@@ -521,8 +526,8 @@
 
   .dot {
     display: block;
-    width: var(--timeline-circle-size);
-    height: var(--timeline-circle-size);
+    width: clamp(10px, var(--timeline-circle-size), 30px);
+    height: clamp(10px, var(--timeline-circle-size), 30px);
     border-radius: 50%;
     background: var(--timeline-circle-color, white);
     border: 3px solid var(--timeline-circle-border-color, #999);
@@ -691,8 +696,8 @@
 
     .snapshot-content {
       height: auto;
-      padding-left: 0;
-      padding-right: 0;
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
 
     /* Stack the timeline bar vertically, centering everything */
