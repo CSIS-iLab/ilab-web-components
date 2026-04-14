@@ -1,9 +1,9 @@
 import { csv } from "d3-fetch"
 
-function formatDateText(dateString) {
+function formatDateText(dateString, longMonth) {
   const date = new Date(`${dateString}T00:00:00`)
   return new Intl.DateTimeFormat("en-US", {
-    month: "short",
+    month: longMonth ? "long" : "short",
     day: "numeric",
     year: "numeric",
   }).format(date)
@@ -25,7 +25,8 @@ export async function getData(URL) {
         description: row.description?.trim() || "",
         date: dateString,
         timestamp,
-        dateText: formatDateText(dateString),
+        dateText: formatDateText(dateString, false),
+        dateTextLongMonth: formatDateText(dateString, true),
         year: new Date(`${dateString}T00:00:00`).getFullYear(),
         imageLink: row.image?.trim() || "",
         imageAlt: row.image_alt?.trim() || "",
