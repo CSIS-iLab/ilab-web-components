@@ -262,6 +262,7 @@
       --btn-bg-hover-color: ${btnBgHoverColor};
       --tooltip-font-size: ${tooltipFontSize};
       --timeline-line-color: ${timelineLineColor};
+      --timeline-circle-size: 26px;
       --timeline-circle-color: ${timelineCircleColor};
       --timeline-circle-border-color: ${timelineCircleBorderColor};
       --timeline-circle-selected-border-color: ${timelineCircleSelectedBorderColor};
@@ -442,7 +443,7 @@
 
   .timeline-tooltip {
     position: absolute;
-    bottom: calc(100% + 0.5rem);
+    bottom: calc(100% + 0);
     transform: translateX(-50%);
     white-space: nowrap;
     font-size: var(--tooltip-font-size);
@@ -452,7 +453,7 @@
     padding: 0.35rem 0.5rem;
     border-radius: 0.375rem;
     box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
-    z-index: 20;
+    /* z-index: 20; */
     pointer-events: none;
   }
 
@@ -496,7 +497,7 @@
   .timeline-track-wrap,
   .timeline-rail,
   .timeline-points {
-    min-height: 4.5rem;
+    min-height: 6.5rem;
   }
 
   .timeline-point {
@@ -520,8 +521,8 @@
 
   .dot {
     display: block;
-    width: 14px;
-    height: 14px;
+    width: var(--timeline-circle-size);
+    height: var(--timeline-circle-size);
     border-radius: 50%;
     background: var(--timeline-circle-color, white);
     border: 3px solid var(--timeline-circle-border-color, #999);
