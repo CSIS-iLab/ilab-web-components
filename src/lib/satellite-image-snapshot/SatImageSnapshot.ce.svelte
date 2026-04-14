@@ -448,7 +448,7 @@
 
   .timeline-tooltip {
     position: absolute;
-    bottom: calc(100% + 0);
+    bottom: calc(100% - 1.5rem);
     transform: translateX(-50%);
     white-space: nowrap;
     font-size: var(--tooltip-font-size);
