@@ -385,7 +385,7 @@
     <div class="snapshot-content">
       <h2>{selectedItem.title}</h2>
       <em>{selectedItem.dateTextLongMonth}</em>
-      <p>{selectedItem.description}</p>
+      <p>{@html selectedItem.description}</p>
     </div>
   </section>
 {/if}
