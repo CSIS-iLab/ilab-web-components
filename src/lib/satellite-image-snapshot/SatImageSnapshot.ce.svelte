@@ -72,6 +72,7 @@
 <script>
   import { onMount, tick } from "svelte"
   import { getData } from "./api/data"
+  import DOMPurify from "dompurify"
 
   let data = $state([])
   let selectedIndex = $state(0)
@@ -385,7 +386,7 @@
     <div class="snapshot-content">
       <h2>{selectedItem.title}</h2>
       <em>{selectedItem.dateTextLongMonth}</em>
-      <p>{@html selectedItem.description}</p>
+      <p>{@html DOMPurify.sanitize(selectedItem.description)}</p>
     </div>
   </section>
 {/if}
