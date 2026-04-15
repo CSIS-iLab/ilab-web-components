@@ -544,7 +544,7 @@
     display: block;
     width: 2px;
     height: 10px;
-    background: var(--timeline-year-color, gray);
+    background: var(--timeline-year-color, #fff);
     position: absolute;
     top: calc(100% + 0.25rem);
     left: 50%;
@@ -671,7 +671,7 @@
     line-height: 1.5;
     color: var(--description-font-color, black);
     font-family: inherit;
-    font-size: var(--description-font-size, 1.5rem);
+    font-size: var(--description-font-size, 1rem);
     text-align: var(--description-alignment, left);
   }
 
