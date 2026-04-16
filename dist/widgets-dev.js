@@ -122,7 +122,7 @@
     --progress-fill-color: ${i()};
     --progress-track-color: ${s()};
     --progress-z-index: ${o()};
-    --progress-offset-top: ${a()}px;
+    --progress-offset-top: ${topOffset||a()}px;
     --progress-value: ${P(l)/r()*100}%;
   `)},[()=>Math.round(P(l))]),Me(n,p),l1(c)}customElements.define("csis-progress-bar",H1(Xs,{height:{reflect:!0,type:"Number"},max:{reflect:!0,type:"Number"},fillColor:{attribute:"fill-color",reflect:!0,type:"String"},trackColor:{attribute:"track-color",reflect:!0,type:"String"},zIndex:{attribute:"z-index",reflect:!0,type:"Number"},offsetTop:{attribute:"offset-top",reflect:!0,type:"Number"}},[],[],!0));const b9=Object.freeze(Object.defineProperty({__proto__:null,default:Xs},Symbol.toStringTag,{value:"Module"}));Ia();function pr(n){if(n===void 0)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return n}function Ws(n,e){n.prototype=Object.create(e.prototype),n.prototype.constructor=n,n.__proto__=e}/*!
  * GSAP 3.13.0
