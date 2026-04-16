@@ -7,6 +7,7 @@
       fillColor: { attribute: "fill-color", type: "String", reflect: true },
       trackColor: { attribute: "track-color", type: "String", reflect: true },
       zIndex: { attribute: "z-index", type: "Number", reflect: true },
+      offsetTop: { attribute: "offset-top", type: "Number", reflect: true },
     },
   }}
 />
@@ -20,6 +21,7 @@
     fillColor = "#000000",
     trackColor = "rgba(0, 0, 0, 0.15)",
     zIndex = 9999,
+    offsetTop = 0,
   } = $props();
 
   let progress = $state(0);
@@ -98,6 +100,7 @@
     --progress-fill-color: ${fillColor};
     --progress-track-color: ${trackColor};
     --progress-z-index: ${zIndex};
+    --progress-offset-top: ${offsetTop}px;
     --progress-value: ${(progress / max) * 100}%;
   `}
 >
@@ -114,7 +117,7 @@
 
   .progress-bar {
     position: fixed;
-    top: 0;
+    top: var(--progress-offset-top);    
     left: 0;
     width: 100%;
     z-index: var(--progress-z-index);
