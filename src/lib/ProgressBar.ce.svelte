@@ -75,7 +75,8 @@
 
     mountEl.style.position = "absolute";
     mountEl.style.left = "0";
-    mountEl.style.bottom = "0";
+    // mountEl.style.bottom = "0";
+    mountEl.style.top = "100%";
     mountEl.style.width = "100%";
     mountEl.style.pointerEvents = "none";
     mountEl.style.zIndex = String(zIndex);
