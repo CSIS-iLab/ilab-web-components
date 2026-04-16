@@ -7,7 +7,6 @@
       fillColor: { attribute: "fill-color", type: "String", reflect: true },
       trackColor: { attribute: "track-color", type: "String", reflect: true },
       zIndex: { attribute: "z-index", type: "Number", reflect: true },
-      offsetTop: { attribute: "offset-top", type: "Number", reflect: true },
     },
   }}
 />
@@ -21,11 +20,13 @@
     fillColor = "#000000",
     trackColor = "rgba(0, 0, 0, 0.15)",
     zIndex = 9999,
-    offsetTop = 0,
   } = $props();
 
   let progress = $state(0);
-  let topOffset = $state(0);
+
+  let mountEl = null;
+  let trackEl = null;
+  let fillEl = null;
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -61,32 +62,79 @@
 
     if (scrollableHeight <= 0) {
       progress = 0;
-      return;
+    } else {
+      const percent = (scrollTop / scrollableHeight) * max;
+      progress = clamp(percent, 0, max);
     }
 
-    const percent = (scrollTop / scrollableHeight) * max;
-    progress = clamp(percent, 0, max);
+    updateBarUI();
   }
-  function getHeaderOffset() {
-    const shorthandHeader = document.querySelector('[class*="HeaderBar"]');
 
-    if (!shorthandHeader) {
-      return offsetTop;
+  function updateBarUI() {
+    if (!mountEl || !trackEl || !fillEl) return;
+
+    mountEl.style.position = "absolute";
+    mountEl.style.left = "0";
+    mountEl.style.bottom = "0";
+    mountEl.style.width = "100%";
+    mountEl.style.pointerEvents = "none";
+    mountEl.style.zIndex = String(zIndex);
+
+    trackEl.style.width = "100%";
+    trackEl.style.height = `${height}px`;
+    trackEl.style.background = trackColor;
+
+    fillEl.style.height = "100%";
+    fillEl.style.width = `${(progress / max) * 100}%`;
+    fillEl.style.background = fillColor;
+    fillEl.style.transition = "width 0.08s linear";
+  }
+
+  function getHeaderElement() {
+    return (
+      document.querySelector(".HeaderBarContainer") ||
+      document.querySelector(".Story-Header") ||
+      document.querySelector(".Levels--header")
+    );
+  }
+
+  function ensureHeaderPositioning(headerEl) {
+    const computed = window.getComputedStyle(headerEl);
+
+    if (computed.position === "static") {
+      headerEl.style.position = "relative";
     }
-
-    return shorthandHeader.getBoundingClientRect().height;
   }
 
-  function updateTopOffset() {
-    topOffset = getHeaderOffset();
+  function createBar() {
+    mountEl = document.createElement("div");
+    mountEl.className = "csis-progress-bar-mounted";
+
+    trackEl = document.createElement("div");
+    trackEl.className = "csis-progress-bar-mounted__track";
+
+    fillEl = document.createElement("div");
+    fillEl.className = "csis-progress-bar-mounted__fill";
+
+    trackEl.appendChild(fillEl);
+    mountEl.appendChild(trackEl);
   }
 
   onMount(() => {
+    const headerEl = getHeaderElement();
+
+    if (!headerEl) {
+      console.warn("csis-progress-bar: could not find Shorthand header");
+      return;
+    }
+
+    ensureHeaderPositioning(headerEl);
+    createBar();
+    headerEl.appendChild(mountEl);
+
     updateProgress();
-    updateTopOffset();
 
     const handleUpdate = () => {
-      updateTopOffset();
       updateProgress();
     };
 
@@ -94,61 +142,22 @@
     window.addEventListener("resize", handleUpdate);
     window.addEventListener("load", handleUpdate);
 
-    // extra update in case layout shifts after mount
     requestAnimationFrame(updateProgress);
 
     return () => {
       window.removeEventListener("scroll", handleUpdate);
       window.removeEventListener("resize", handleUpdate);
       window.removeEventListener("load", handleUpdate);
+
+      if (mountEl && mountEl.parentNode) {
+        mountEl.parentNode.removeChild(mountEl);
+      }
     };
   });
 </script>
 
-<div
-  class="progress-bar"
-  role="progressbar"
-  aria-valuemin="0"
-  aria-valuemax={max}
-  aria-valuenow={Math.round(progress)}
-  style={`
-    --progress-height: ${height}px;
-    --progress-fill-color: ${fillColor};
-    --progress-track-color: ${trackColor};
-    --progress-z-index: ${zIndex};
-    --progress-offset-top: ${topOffset || offsetTop}px;
-    --progress-value: ${(progress / max) * 100}%;
-  `}
->
-  <div class="progress-bar__track">
-    <div class="progress-bar__fill"></div>
-  </div>
-</div>
-
 <style>
   :host {
-    display: block;
-    pointer-events: none;
-  }
-
-  .progress-bar {
-    position: fixed;
-    top: var(--progress-offset-top);
-    left: 0;
-    width: 100%;
-    z-index: var(--progress-z-index);
-  }
-
-  .progress-bar__track {
-    width: 100%;
-    height: var(--progress-height);
-    background: var(--progress-track-color);
-  }
-
-  .progress-bar__fill {
-    width: var(--progress-value);
-    height: 100%;
-    background: var(--progress-fill-color);
-    transition: width 0.08s linear;
+    display: none;
   }
 </style>
