@@ -388,4 +388,20 @@
       font-size: clamp(1.8rem, 8vw, 3rem);
     }
   }
+
+  @media (max-width: 400px) {
+    .word-flip__inner {
+      justify-content: center;
+      text-align: center;
+      padding-inline: 0.5rem;
+    }
+
+    .word-flip__prefix {
+      text-align: right;
+    }
+
+    .word-flip__list {
+      text-align: left;
+    }
+  }
 </style>
