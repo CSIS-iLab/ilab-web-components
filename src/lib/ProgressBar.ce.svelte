@@ -48,7 +48,7 @@
       doc.scrollHeight,
       doc.offsetHeight,
       body.scrollHeight,
-      body.offsetHeight
+      body.offsetHeight,
     );
 
     return Math.max(scrollHeight - window.innerHeight, 0);
@@ -63,8 +63,23 @@
       return;
     }
 
+    let topOffset = $state(0);
+
     const percent = (scrollTop / scrollableHeight) * max;
     progress = clamp(percent, 0, max);
+  }
+  function getHeaderOffset() {
+    const shorthandHeader = document.querySelector('[class*="HeaderBar"]');
+
+    if (!shorthandHeader) {
+      return offsetTop;
+    }
+
+    return shorthandHeader.getBoundingClientRect().height;
+  }
+
+  function updateTopOffset() {
+    topOffset = getHeaderOffset();
   }
 
   onMount(() => {
@@ -100,7 +115,7 @@
     --progress-fill-color: ${fillColor};
     --progress-track-color: ${trackColor};
     --progress-z-index: ${zIndex};
-    --progress-offset-top: ${offsetTop}px;
+    --progress-offset-top: ${topOffset || offsetTop}px;
     --progress-value: ${(progress / max) * 100}%;
   `}
 >
@@ -117,7 +132,7 @@
 
   .progress-bar {
     position: fixed;
-    top: var(--progress-offset-top);    
+    top: var(--progress-offset-top);
     left: 0;
     width: 100%;
     z-index: var(--progress-z-index);
