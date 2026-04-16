@@ -25,6 +25,7 @@
   } = $props();
 
   let progress = $state(0);
+  let topOffset = $state(0);
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -63,8 +64,6 @@
       return;
     }
 
-    let topOffset = $state(0);
-
     const percent = (scrollTop / scrollableHeight) * max;
     progress = clamp(percent, 0, max);
   }
@@ -84,8 +83,10 @@
 
   onMount(() => {
     updateProgress();
+    updateTopOffset();
 
     const handleUpdate = () => {
+      updateTopOffset();
       updateProgress();
     };
 
