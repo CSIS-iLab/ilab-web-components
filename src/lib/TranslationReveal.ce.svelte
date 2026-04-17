@@ -272,6 +272,7 @@
 <div
   class="translation-lines"
   bind:this={rootEl}
+  role="presentation"
   onmouseenter={() => (isPointerOver = true)}
   onmouseleave={() => (isPointerOver = false)}
   style:--tl-max-width={maxWidth}
