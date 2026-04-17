@@ -6,8 +6,6 @@
       targetText: { attribute: "target-text", type: "String", reflect: true },
       sourceLang: { attribute: "source-lang", type: "String", reflect: true },
       targetLang: { attribute: "target-lang", type: "String", reflect: true },
-      height: { type: "Number", reflect: true },
-      stickyTop: { attribute: "sticky-top", type: "String", reflect: true },
       maxWidth: { attribute: "max-width", type: "String", reflect: true },
       fontSize: { attribute: "font-size", type: "String", reflect: true },
       lineHeight: { attribute: "line-height", type: "String", reflect: true },
@@ -28,6 +26,11 @@
         type: "Number",
         reflect: true,
       },
+      wheelSensitivity: {
+        attribute: "wheel-sensitivity",
+        type: "Number",
+        reflect: true,
+      },
       quoteMark: { attribute: "quote-mark", type: "Boolean", reflect: true },
       debug: { type: "Boolean", reflect: true },
     },
@@ -42,8 +45,6 @@
     targetText = "The Policy Trajectory of the U.S. Monroe Doctrine and Prospects for China–Latin America Cooperation",
     sourceLang = "zh",
     targetLang = "en",
-    height = 90,
-    stickyTop = "18vh",
     maxWidth = "48rem",
     fontSize = "clamp(2rem, 3vw + 0.5rem, 3.5rem)",
     lineHeight = "1.15",
@@ -56,37 +57,23 @@
     lineStagger = 0.16,
     revealWindow = 0.24,
     edgeSoftness = 4,
+    wheelSensitivity = 0.002,
     quoteMark = true,
     debug = false,
   } = $props();
 
   let rootEl = null;
   let measureEl = null;
+
   let progress = $state(0);
   let sourceLines = $state([]);
   let targetLines = $state([]);
-  let stickyEl = null;
+  let isActiveZone = $state(false);
+  let isPointerOver = $state(false);
+  let touchY = $state(null);
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
-  }
-
-  function updateProgress() {
-    if (!rootEl) return;
-
-    const rect = rootEl.getBoundingClientRect();
-    const vh = window.innerHeight;
-
-    const totalScrollable = Math.max(rect.height - vh, 1);
-    const raw = -rect.top / totalScrollable;
-
-    progress = clamp(raw, 0, 1);
-  }
-
-  function getLineProgress(index) {
-    const start = index * lineStagger;
-    const end = start + revealWindow;
-    return clamp((progress - start) / (end - start), 0, 1);
   }
 
   function tokenize(text, lang) {
@@ -94,7 +81,6 @@
     if (!raw) return [];
 
     const segments = raw.split("\n");
-
     const isCjk = /^(zh|ja|ko)\b/i.test(lang || "");
     const tokens = [];
 
@@ -164,6 +150,16 @@
 
   const lineCount = $derived(Math.max(sourceLines.length, targetLines.length));
 
+  const totalProgressNeeded = $derived(
+    Math.max(1, Math.max(lineCount - 1, 0) * lineStagger + revealWindow),
+  );
+
+  function getLineProgress(index) {
+    const start = index * lineStagger;
+    const end = start + revealWindow;
+    return clamp((progress - start) / (end - start), 0, 1);
+  }
+
   const lines = $derived(
     Array.from({ length: lineCount }, (_, index) => ({
       index,
@@ -173,42 +169,102 @@
     })),
   );
 
-  const totalProgressNeeded = $derived(
-    Math.max(1, Math.max(lineCount - 1, 0) * lineStagger + revealWindow),
-  );
+  function updateActiveZone() {
+    if (!rootEl) return;
 
-const effectiveHeight = $derived(
-  Math.max(height, Math.ceil(totalProgressNeeded * 80 + 20)),
-);
+    const rect = rootEl.getBoundingClientRect();
+    const vh = window.innerHeight;
+
+    const topThreshold = vh * 0.8;
+    const bottomThreshold = vh * 0.2;
+
+    isActiveZone = rect.top < topThreshold && rect.bottom > bottomThreshold;
+  }
+
+  function applyDelta(delta) {
+    const next = clamp(
+      progress + delta * wheelSensitivity,
+      0,
+      totalProgressNeeded,
+    );
+
+    const changed = next !== progress;
+    progress = next;
+    return changed;
+  }
+
+  function handleWheel(event) {
+    if (!isPointerOver || !isActiveZone) return;
+
+    const changed = applyDelta(event.deltaY);
+
+    if (changed) {
+      event.preventDefault();
+    }
+  }
+
+  function handleTouchStart(event) {
+    if (!isActiveZone) return;
+    if (event.touches.length !== 1) return;
+    touchY = event.touches[0].clientY;
+  }
+
+  function handleTouchMove(event) {
+    if (!isActiveZone || touchY == null) return;
+    if (event.touches.length !== 1) return;
+
+    const currentY = event.touches[0].clientY;
+    const delta = touchY - currentY;
+    const changed = applyDelta(delta);
+
+    if (changed) {
+      event.preventDefault();
+      touchY = currentY;
+    }
+  }
+
+  function handleTouchEnd() {
+    touchY = null;
+  }
+
   onMount(() => {
     updateWrappedLines();
-    updateProgress();
+    updateActiveZone();
 
-    const handleScroll = () => updateProgress();
     const handleResize = () => {
       updateWrappedLines();
-      updateProgress();
+      updateActiveZone();
+    };
+
+    const handleScroll = () => {
+      updateActiveZone();
     };
 
     const resizeObserver = new ResizeObserver(() => {
       updateWrappedLines();
-      updateProgress();
+      updateActiveZone();
     });
 
-    if (measureEl) {
-      resizeObserver.observe(measureEl);
-    }
-    if (rootEl) {
-      resizeObserver.observe(rootEl);
-    }
+    if (measureEl) resizeObserver.observe(measureEl);
+    if (rootEl) resizeObserver.observe(rootEl);
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    rootEl?.addEventListener("wheel", handleWheel, { passive: false });
+    rootEl?.addEventListener("touchstart", handleTouchStart, { passive: true });
+    rootEl?.addEventListener("touchmove", handleTouchMove, { passive: false });
+    rootEl?.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     return () => {
       resizeObserver.disconnect();
-      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", handleScroll);
+
+      rootEl?.removeEventListener("wheel", handleWheel);
+      rootEl?.removeEventListener("touchstart", handleTouchStart);
+      rootEl?.removeEventListener("touchmove", handleTouchMove);
+      rootEl?.removeEventListener("touchend", handleTouchEnd);
     };
   });
 </script>
@@ -216,8 +272,8 @@ const effectiveHeight = $derived(
 <div
   class="translation-lines"
   bind:this={rootEl}
-  style:--tl-height={`${effectiveHeight}vh`}
-  style:--tl-sticky-top={stickyTop}
+  onmouseenter={() => (isPointerOver = true)}
+  onmouseleave={() => (isPointerOver = false)}
   style:--tl-max-width={maxWidth}
   style:--tl-font-size={fontSize}
   style:--tl-line-height={lineHeight}
@@ -228,52 +284,52 @@ const effectiveHeight = $derived(
   style:--tl-border-color={borderColor}
   style:--tl-edge-softness={`${edgeSoftness}px`}
 >
-  <div class="translation-lines__sticky" bind:this={stickyEl}>
-    <div class="translation-lines__frame">
-      {#if quoteMark}
-        <div class="translation-lines__quote" aria-hidden="true">“</div>
-      {/if}
-
-      <div class="translation-lines__content">
-        <div
-          class="translation-lines__measure-probe"
-          bind:this={measureEl}
-          aria-hidden="true"
-        ></div>
-
-        {#each lines as line}
-          <div
-            class="translation-lines__row"
-            class:is-fade={mode === "fade"}
-            class:is-wipe={mode !== "fade"}
-            class:is-before={line.progress <= 0}
-            class:is-active={line.progress > 0 && line.progress < 1}
-            class:is-after={line.progress >= 1}
-            style={`--line-progress:${line.progress};`}
-          >
-            <div class="translation-lines__source" lang={sourceLang}>
-              {line.source || "\u00A0"}
-            </div>
-
-            <div class="translation-lines__target" lang={targetLang}>
-              {line.target || "\u00A0"}
-            </div>
-          </div>
-        {/each}
-      </div>
-    </div>
-
-    {#if debug}
-      <div class="translation-lines__debug">
-        overall: {progress.toFixed(2)}<br />
-        source lines: {sourceLines.length}<br />
-        target lines: {targetLines.length}<br />
-        {#each lines as line}
-          line {line.index + 1}: {line.progress.toFixed(2)}<br />
-        {/each}
-      </div>
+  <div class="translation-lines__frame">
+    {#if quoteMark}
+      <div class="translation-lines__quote" aria-hidden="true">“</div>
     {/if}
+
+    <div class="translation-lines__content">
+      <div
+        class="translation-lines__measure-probe"
+        bind:this={measureEl}
+        aria-hidden="true"
+      ></div>
+
+      {#each lines as line}
+        <div
+          class="translation-lines__row"
+          class:is-fade={mode === "fade"}
+          class:is-wipe={mode !== "fade"}
+          class:is-before={line.progress <= 0}
+          class:is-active={line.progress > 0 && line.progress < 1}
+          class:is-after={line.progress >= 1}
+          style={`--line-progress:${line.progress};`}
+        >
+          <div class="translation-lines__source" lang={sourceLang}>
+            {line.source || "\u00A0"}
+          </div>
+
+          <div class="translation-lines__target" lang={targetLang}>
+            {line.target || "\u00A0"}
+          </div>
+        </div>
+      {/each}
+    </div>
   </div>
+
+  {#if debug}
+    <div class="translation-lines__debug">
+      overall: {progress.toFixed(2)} / {totalProgressNeeded.toFixed(2)}<br />
+      source lines: {sourceLines.length}<br />
+      target lines: {targetLines.length}<br />
+      active zone: {isActiveZone ? "true" : "false"}<br />
+      pointer over: {isPointerOver ? "true" : "false"}<br />
+      {#each lines as line}
+        line {line.index + 1}: {line.progress.toFixed(2)}<br />
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -283,13 +339,6 @@ const effectiveHeight = $derived(
 
   .translation-lines {
     position: relative;
-    height: var(--tl-height, 220vh);
-    background: transparent;
-  }
-
-  .translation-lines__sticky {
-    position: sticky;
-    top: var(--tl-sticky-top, 18vh);
     padding: 0 1rem;
   }
 
