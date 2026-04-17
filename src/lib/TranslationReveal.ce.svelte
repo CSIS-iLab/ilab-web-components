@@ -38,8 +38,9 @@
   import { onMount } from "svelte";
 
   let {
-    sourceText = "在某个阶段\n我们应该预期\n机器将会\n接管控制。",
-    targetText = "At some stage therefore\nwe should have to\nexpect the machines\nto take control.",
+    sourceText = "美国门罗主义的政策态势及中拉合作展望",
+    targetText =
+      "The Policy Trajectory of the U.S. Monroe Doctrine and Prospects for China–Latin America Cooperation",
     sourceLang = "zh",
     targetLang = "en",
     height = 220,
@@ -61,37 +62,81 @@
   } = $props();
 
   let rootEl = null;
+  let measureEl = null;
   let progress = $state(0);
+  let sourceLines = $state([]);
+  let targetLines = $state([]);
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
   }
 
-  function splitLines(text) {
-    return String(text ?? "")
-      .split("\n")
-      .map((line) => line.trim());
+  function updateProgress() {
+    if (!rootEl) return;
+
+    const rect = rootEl.getBoundingClientRect();
+    const vh = window.innerHeight;
+
+    const totalScrollable = Math.max(rect.height - vh, 1);
+    const raw = -rect.top / totalScrollable;
+
+    progress = clamp(raw, 0, 1);
   }
 
-function updateProgress() {
-  if (!rootEl) return;
-
-  const rect = rootEl.getBoundingClientRect();
-  const vh = window.innerHeight;
-
-  const totalScrollable = Math.max(rect.height - vh, 1);
-  const raw = -rect.top / totalScrollable;
-
-  progress = clamp(raw, 0, 1);
-}
   function getLineProgress(index) {
     const start = index * lineStagger;
     const end = start + revealWindow;
     return clamp((progress - start) / (end - start), 0, 1);
   }
 
-  const sourceLines = $derived(splitLines(sourceText));
-  const targetLines = $derived(splitLines(targetText));
+  function tokenize(text, lang) {
+    const value = String(text ?? "").replace(/\s+/g, " ").trim();
+    if (!value) return [];
+
+    const isCjk = /^(zh|ja|ko)\b/i.test(lang || "");
+    if (isCjk) {
+      return Array.from(value);
+    }
+
+    return value.match(/\S+\s*/g) ?? [value];
+  }
+
+  function measureWrappedLines(text, lang) {
+    if (!measureEl) return text ? [text] : [];
+
+    const tokens = tokenize(text, lang);
+    if (!tokens.length) return [];
+
+    const lines = [];
+    let current = "";
+
+    measureEl.lang = lang || "";
+
+    for (const token of tokens) {
+      const candidate = current + token;
+      measureEl.textContent = candidate;
+
+      if (measureEl.scrollWidth <= measureEl.clientWidth || !current) {
+        current = candidate;
+      } else {
+        lines.push(current.trimEnd());
+        current = token.trimStart();
+      }
+    }
+
+    if (current) {
+      lines.push(current.trimEnd());
+    }
+
+    return lines;
+  }
+
+  function updateWrappedLines() {
+    if (!measureEl) return;
+    sourceLines = measureWrappedLines(sourceText, sourceLang);
+    targetLines = measureWrappedLines(targetText, targetLang);
+  }
+
   const lineCount = $derived(Math.max(sourceLines.length, targetLines.length));
 
   const lines = $derived(
@@ -104,16 +149,34 @@ function updateProgress() {
   );
 
   onMount(() => {
+    updateWrappedLines();
     updateProgress();
 
     const handleScroll = () => updateProgress();
+    const handleResize = () => {
+      updateWrappedLines();
+      updateProgress();
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateWrappedLines();
+      updateProgress();
+    });
+
+    if (measureEl) {
+      resizeObserver.observe(measureEl);
+    }
+    if (rootEl) {
+      resizeObserver.observe(rootEl);
+    }
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
+    window.addEventListener("resize", handleResize);
 
     return () => {
+      resizeObserver.disconnect();
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener("resize", handleResize);
     };
   });
 </script>
@@ -140,6 +203,12 @@ function updateProgress() {
       {/if}
 
       <div class="translation-lines__content">
+        <div
+          class="translation-lines__measure-probe"
+          bind:this={measureEl}
+          aria-hidden="true"
+        ></div>
+
         {#each lines as line}
           <div
             class="translation-lines__row"
@@ -165,6 +234,8 @@ function updateProgress() {
     {#if debug}
       <div class="translation-lines__debug">
         overall: {progress.toFixed(2)}<br />
+        source lines: {sourceLines.length}<br />
+        target lines: {targetLines.length}<br />
         {#each lines as line}
           line {line.index + 1}: {line.progress.toFixed(2)}<br />
         {/each}
@@ -214,6 +285,25 @@ function updateProgress() {
     z-index: 1;
   }
 
+  .translation-lines__measure-probe {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    white-space: nowrap;
+    inset: 0;
+    width: 100%;
+    font-family: var(
+      --tl-font-family,
+      Inter,
+      ui-sans-serif,
+      system-ui,
+      sans-serif
+    );
+    font-size: var(--tl-font-size, clamp(2rem, 3vw + 0.5rem, 3.5rem));
+    line-height: var(--tl-line-height, 1.15);
+    letter-spacing: -0.02em;
+  }
+
   .translation-lines__row {
     position: relative;
     min-height: calc(var(--tl-font-size, 3rem) * var(--tl-line-height, 1.15));
@@ -252,26 +342,18 @@ function updateProgress() {
 
   .translation-lines__row.is-before .translation-lines__source {
     opacity: 1;
-    -webkit-mask-image: none;
-    mask-image: none;
   }
 
   .translation-lines__row.is-before .translation-lines__target {
     opacity: 0;
-    -webkit-mask-image: none;
-    mask-image: none;
   }
 
   .translation-lines__row.is-after .translation-lines__source {
     opacity: 0;
-    -webkit-mask-image: none;
-    mask-image: none;
   }
 
   .translation-lines__row.is-after .translation-lines__target {
     opacity: 1;
-    -webkit-mask-image: none;
-    mask-image: none;
   }
 
   .translation-lines__row.is-wipe.is-active .translation-lines__source {
