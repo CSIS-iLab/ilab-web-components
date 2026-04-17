@@ -39,11 +39,10 @@
 
   let {
     sourceText = "美国门罗主义的政策态势及中拉合作展望",
-    targetText =
-      "The Policy Trajectory of the U.S. Monroe Doctrine and Prospects for China–Latin America Cooperation",
+    targetText = "The Policy Trajectory of the U.S. Monroe Doctrine and Prospects for China–Latin America Cooperation",
     sourceLang = "zh",
     targetLang = "en",
-    height = 220,
+    height = 90,
     stickyTop = "18vh",
     maxWidth = "48rem",
     fontSize = "clamp(2rem, 3vw + 0.5rem, 3.5rem)",
@@ -66,6 +65,7 @@
   let progress = $state(0);
   let sourceLines = $state([]);
   let targetLines = $state([]);
+  let stickyEl = null;
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -90,15 +90,34 @@
   }
 
   function tokenize(text, lang) {
-    const value = String(text ?? "").replace(/\s+/g, " ").trim();
-    if (!value) return [];
+    const raw = String(text ?? "");
+    if (!raw) return [];
+
+    const segments = raw.split("\n");
 
     const isCjk = /^(zh|ja|ko)\b/i.test(lang || "");
-    if (isCjk) {
-      return Array.from(value);
+    const tokens = [];
+
+    for (const segment of segments) {
+      if (!segment) {
+        tokens.push("\n");
+        continue;
+      }
+
+      if (isCjk) {
+        tokens.push(...Array.from(segment));
+      } else {
+        tokens.push(...(segment.match(/\S+\s*/g) ?? [segment]));
+      }
+
+      tokens.push("\n");
     }
 
-    return value.match(/\S+\s*/g) ?? [value];
+    if (tokens[tokens.length - 1] === "\n") {
+      tokens.pop();
+    }
+
+    return tokens;
   }
 
   function measureWrappedLines(text, lang) {
@@ -113,6 +132,12 @@
     measureEl.lang = lang || "";
 
     for (const token of tokens) {
+      if (token === "\n") {
+        lines.push(current.trimEnd());
+        current = "";
+        continue;
+      }
+
       const candidate = current + token;
       measureEl.textContent = candidate;
 
@@ -148,6 +173,13 @@
     })),
   );
 
+  const totalProgressNeeded = $derived(
+    Math.max(1, Math.max(lineCount - 1, 0) * lineStagger + revealWindow),
+  );
+
+const effectiveHeight = $derived(
+  Math.max(height, Math.ceil(totalProgressNeeded * 80 + 20)),
+);
   onMount(() => {
     updateWrappedLines();
     updateProgress();
@@ -184,7 +216,7 @@
 <div
   class="translation-lines"
   bind:this={rootEl}
-  style:--tl-height={`${height}vh`}
+  style:--tl-height={`${effectiveHeight}vh`}
   style:--tl-sticky-top={stickyTop}
   style:--tl-max-width={maxWidth}
   style:--tl-font-size={fontSize}
@@ -196,7 +228,7 @@
   style:--tl-border-color={borderColor}
   style:--tl-edge-softness={`${edgeSoftness}px`}
 >
-  <div class="translation-lines__sticky">
+  <div class="translation-lines__sticky" bind:this={stickyEl}>
     <div class="translation-lines__frame">
       {#if quoteMark}
         <div class="translation-lines__quote" aria-hidden="true">“</div>
@@ -252,7 +284,7 @@
   .translation-lines {
     position: relative;
     height: var(--tl-height, 220vh);
-    background: var(--tl-background, #f5f2ee);
+    background: transparent;
   }
 
   .translation-lines__sticky {
@@ -267,7 +299,7 @@
     margin: 0 auto;
     padding: 3rem 2.75rem;
     border: 1px solid var(--tl-border-color, rgba(0, 0, 0, 0.14));
-    background: transparent;
+    background: var(--tl-background, #f5f2ee);
   }
 
   .translation-lines__quote {
