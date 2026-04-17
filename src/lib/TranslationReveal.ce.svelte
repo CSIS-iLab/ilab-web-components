@@ -194,9 +194,20 @@
   }
 
   function handleWheel(event) {
-    if (!isPointerOver || !isActiveZone) return;
+    if (!isActiveZone) return;
 
-    const changed = applyDelta(event.deltaY);
+    const delta = event.deltaY;
+    const goingDown = delta > 0;
+    const goingUp = delta < 0;
+
+    const canAdvanceDown = goingDown && progress < totalProgressNeeded;
+    const canAdvanceUp = goingUp && progress > 0;
+
+    if (!canAdvanceDown && !canAdvanceUp) {
+      return;
+    }
+
+    const changed = applyDelta(delta);
 
     if (changed) {
       event.preventDefault();
@@ -215,6 +226,18 @@
 
     const currentY = event.touches[0].clientY;
     const delta = touchY - currentY;
+
+    const goingDown = delta > 0;
+    const goingUp = delta < 0;
+
+    const canAdvanceDown = goingDown && progress < totalProgressNeeded;
+    const canAdvanceUp = goingUp && progress > 0;
+
+    if (!canAdvanceDown && !canAdvanceUp) {
+      touchY = currentY;
+      return;
+    }
+
     const changed = applyDelta(delta);
 
     if (changed) {
