@@ -9,7 +9,12 @@
       maskColor: { attribute: "mask-color", type: "String", reflect: true },
       start: { type: "String", reflect: true },
       end: { type: "String", reflect: true },
-      markers: { type: "Boolean", reflect: true }
+      markers: { type: "Boolean", reflect: true },
+      maxWidth: { attribute: "max-width", type: "String", reflect: true },
+      fontSize: { attribute: "font-size", type: "String", reflect: true },
+      lineHeight: { attribute: "line-height", type: "String", reflect: true },
+      fontWeight: { attribute: "font-weight", type: "String", reflect: true },
+      fontFamily: { attribute: "font-family", type: "String", reflect: true }
     }
   }}
 />
@@ -25,11 +30,16 @@
     bottomText = "Translated text",
     topText = "Original text",
     bottomColor = "#000000",
-    topColor = "#000000",
-    maskColor = "#fff",
+    topColor = "#fff",
+    maskColor = "#333",
     start = "top 80%",
     end = "+=800",
-    markers = false
+    markers = false,
+    maxWidth = "800px",
+    fontSize = "1.5rem",
+    lineHeight = "1.2",
+    fontWeight = "400",
+    fontFamily = "inherit"
   } = $props();
 
   let wrapperEl;
@@ -67,6 +77,11 @@
   style:--bottom-color={bottomColor}
   style:--top-color={topColor}
   style:--mask-color={maskColor}
+  style:--max-width={maxWidth}
+  style:--font-size={fontSize}
+  style:--line-height={lineHeight}
+  style:--font-weight={fontWeight}
+  style:--font-family={fontFamily}
 >
   <p class="bottom">{bottomText}</p>
 
@@ -83,14 +98,20 @@
   .stack {
     position: relative;
     display: inline-block;
+    max-width: var(--max-width);
+    font-family: var(--font-family);
   }
 
   .bottom,
   .top {
     margin: 0;
-    font-size: 1.5rem;
-    line-height: 1.2;
-    white-space: nowrap;
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+    font-weight: var(--font-weight);
+    letter-spacing: normal;
+    white-space: normal;
+    display: block;
+    width: 100%;
   }
 
   .bottom {
@@ -102,6 +123,7 @@
     inset: 0;
     overflow: hidden;
     width: 100%;
+    background: var(--mask-color);
   }
 
   .top {
