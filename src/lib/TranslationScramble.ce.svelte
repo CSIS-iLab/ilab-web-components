@@ -10,7 +10,11 @@
       dudColor: { attribute: "dud-color", type: "String", reflect: true },
       label: { type: "String", reflect: true },
       labelColor: { attribute: "label-color", type: "String", reflect: true },
-      triggerStart: { attribute: "trigger-start", type: "String", reflect: true },
+      triggerStart: {
+        attribute: "trigger-start",
+        type: "String",
+        reflect: true,
+      },
       speed: { type: "Number", reflect: true },
       revealDelay: { attribute: "reveal-delay", type: "Number", reflect: true },
     },
@@ -118,13 +122,14 @@
   }
 
   let fx;
-  let hasRun = false;
+  // let hasRun = false;
   let st;
+  let delayCall;
 
   onMount(() => {
     fx = new TextScramble(
       textEl,
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>\\/[]{}—=+*#%:;:"
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>\\/[]{}—=+*#%:;:",
     );
 
     textEl.textContent = topText;
@@ -137,24 +142,33 @@
     st = ScrollTrigger.create({
       trigger: container,
       start: triggerStart,
-      once: true,
       onEnter: () => {
-        if (hasRun) return;
-        hasRun = true;
+        if (delayCall) {
+          delayCall.kill();
+          delayCall = null;
+        }
 
         if (revealDelay > 0) {
-          gsap.delayedCall(revealDelay / 1000, () => {
+          delayCall = gsap.delayedCall(revealDelay / 1000, () => {
             fx.setText(bottomText);
           });
         } else {
           fx.setText(bottomText);
         }
       },
+      onLeaveBack: () => {
+        if (delayCall) {
+          delayCall.kill();
+          delayCall = null;
+        }
+        fx.setText(topText);
+      },
     });
 
     ScrollTrigger.refresh();
 
     return () => {
+      delayCall?.kill();
       st?.kill();
       fx?.destroy();
     };
@@ -204,15 +218,8 @@
   }
 
   .label {
-    font-family:
-      ui-monospace,
-      SFMono-Regular,
-      Menlo,
-      Monaco,
-      Consolas,
-      "Liberation Mono",
-      "Courier New",
-      monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
     font-size: 0.72rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
