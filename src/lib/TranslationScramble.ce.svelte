@@ -101,7 +101,7 @@
     [textEl, ghostLeftEl, ghostRightEl].forEach((el) => {
       if (!el) return;
       el.style.fontFamily = latinFontFamily;
-      el.style.letterSpacing = "0.08em";
+      el.style.letterSpacing = "0.03em";
     });
   }
 
@@ -142,7 +142,11 @@
       for (let i = 0; i < length; i += 1) {
         const from = oldText[i] || "";
         const to = newText[i] || "";
-        const start = Math.floor(Math.random() * 16 * speed);
+        const isAddedChar = i >= oldText.length;
+        const baseStart = Math.floor(Math.random() * 16 * speed);
+        const start = isAddedChar
+          ? baseStart + Math.floor(10 * speed)
+          : baseStart;
         const end = start + Math.floor(Math.random() * 24 * speed) + 10;
         this.queue.push({ from, to, start, end, char: "" });
       }
@@ -179,15 +183,20 @@
           output += to;
           plainText += to;
         } else if (this.frame >= start) {
-          if (!char || Math.random() < 0.28) {
-            char = this.randomChar();
-            this.queue[i].char = char;
+          if (to === " ") {
+            output += " ";
+            plainText += " ";
+          } else {
+            if (!char || Math.random() < 0.28) {
+              char = this.randomChar();
+              this.queue[i].char = char;
+            }
+            output += `<span class="dud">${char}</span>`;
+            plainText += char;
           }
-          output += `<span class="dud">${char}</span>`;
-          plainText += char;
         } else {
-          output += from;
-          plainText += from;
+          output += from || "";
+          plainText += from || "";
         }
       }
 
@@ -218,7 +227,7 @@
       textEl,
       ghostLeftEl,
       ghostRightEl,
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>\\/[]{}—=+*#%:;:"
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>\\/[]{}—=+*#%:;:",
     );
 
     textEl.textContent = topText;
@@ -360,6 +369,17 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity 120ms linear;
+  }
+
+  .text,
+  .ghost {
+    width: min(680px, 100%);
+    font-size: clamp(1.15rem, 2vw, 1.85rem);
+    line-height: 1.35;
+    grid-area: 1 / 1;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .ghost--left {
