@@ -8,6 +8,7 @@
       bgColor: { attribute: "bg-color", type: "String", reflect: true },
       textColor: { attribute: "text-color", type: "String", reflect: true },
       dudColor: { attribute: "dud-color", type: "String", reflect: true },
+      ghostColor: { attribute: "ghost-color", type: "String", reflect: true },
       label: { type: "String", reflect: true },
       labelColor: { attribute: "label-color", type: "String", reflect: true },
       triggerStart: {
@@ -32,9 +33,10 @@
     topText = "政策态势及中拉合作展望。",
     bottomText = "The Policy Trajectory and Prospects for China-Latin America Cooperation",
     height = 220,
-    bgColor = "#0f0f10",
-    textColor = "#f2ede3",
-    dudColor = "#b44a3c",
+    bgColor = "#1d1e22",
+    textColor = "#a5e5d4",
+    dudColor = "#42c3c8",
+    ghostColor = "#ff00ff",
     label = "signal decode",
     labelColor = "#8e3b32",
     triggerStart = "top 72%",
@@ -44,11 +46,15 @@
 
   let container;
   let textEl;
+  let ghostLeftEl;
+  let ghostRightEl;
   let labelEl;
 
   class TextScramble {
-    constructor(el, chars) {
+    constructor(el, ghostLeftEl, ghostRightEl, chars) {
       this.el = el;
+      this.ghostLeftEl = ghostLeftEl;
+      this.ghostRightEl = ghostRightEl;
       this.chars = chars;
       this.update = this.update.bind(this);
       this.frame = 0;
@@ -76,6 +82,9 @@
 
       cancelAnimationFrame(this.frameRequest);
       this.frame = 0;
+      this.el.classList.add("is-glitching");
+      this.ghostLeftEl.style.opacity = "1";
+      this.ghostRightEl.style.opacity = "1";
       this.update();
 
       return promise;
@@ -85,8 +94,14 @@
       return this.chars[Math.floor(Math.random() * this.chars.length)];
     }
 
+    syncGhosts(text) {
+      this.ghostLeftEl.textContent = text;
+      this.ghostRightEl.textContent = text;
+    }
+
     update() {
       let output = "";
+      let plainText = "";
       let complete = 0;
 
       for (let i = 0; i < this.queue.length; i += 1) {
@@ -95,20 +110,27 @@
         if (this.frame >= end) {
           complete += 1;
           output += to;
+          plainText += to;
         } else if (this.frame >= start) {
           if (!char || Math.random() < 0.28) {
             char = this.randomChar();
             this.queue[i].char = char;
           }
           output += `<span class="dud">${char}</span>`;
+          plainText += char;
         } else {
           output += from;
+          plainText += from;
         }
       }
 
       this.el.innerHTML = output;
+      this.syncGhosts(plainText);
 
       if (complete === this.queue.length) {
+        this.el.classList.remove("is-glitching");
+        this.ghostLeftEl.style.opacity = "0";
+        this.ghostRightEl.style.opacity = "0";
         this.resolve?.();
       } else {
         this.frameRequest = requestAnimationFrame(this.update);
@@ -122,17 +144,20 @@
   }
 
   let fx;
-  // let hasRun = false;
   let st;
   let delayCall;
 
   onMount(() => {
     fx = new TextScramble(
       textEl,
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>\\/[]{}—=+*#%:;:",
+      ghostLeftEl,
+      ghostRightEl,
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>\\/[]{}—=+*#%:;:"
     );
 
     textEl.textContent = topText;
+    ghostLeftEl.textContent = topText;
+    ghostRightEl.textContent = topText;
 
     gsap.set(labelEl, {
       opacity: 0.95,
@@ -182,13 +207,17 @@
     --bg: {bgColor};
     --text: {textColor};
     --dud: {dudColor};
+    --ghost: {ghostColor};
     --label: {labelColor};
     height: {height}px;
   "
 >
   <div class="frame">
     <div class="label" bind:this={labelEl}>{label}</div>
+
     <div class="text-stage">
+      <div class="ghost ghost--left" bind:this={ghostLeftEl}></div>
+      <div class="ghost ghost--right" bind:this={ghostRightEl}></div>
       <div class="text" bind:this={textEl}></div>
     </div>
   </div>
@@ -228,23 +257,56 @@
   }
 
   .text-stage {
+    position: relative;
     min-height: 5.8rem;
     display: grid;
     place-items: center;
     text-align: center;
   }
 
-  .text {
+  .text,
+  .ghost {
     width: min(680px, 100%);
-    color: var(--text);
     font-size: clamp(1.15rem, 2vw, 1.85rem);
     line-height: 1.35;
     letter-spacing: 0.01em;
+    grid-area: 1 / 1;
+    white-space: pre-wrap;
+  }
+
+  .text {
+    position: relative;
+    color: var(--text);
+    z-index: 3;
+    text-shadow: 0 0 10px rgba(165, 229, 212, 0.22);
+  }
+
+  .ghost {
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 120ms linear;
+  }
+
+  .ghost--left {
+    color: var(--ghost);
+    transform: translateX(-3px);
+    z-index: 1;
+  }
+
+  .ghost--right {
+    color: var(--dud);
+    transform: translateX(3px);
+    z-index: 2;
+  }
+
+  .text.is-glitching ~ .ghost,
+  .text-stage:has(.text.is-glitching) .ghost {
+    opacity: 0.8;
   }
 
   .text :global(.dud) {
     color: var(--dud);
-    opacity: 0.85;
-    text-shadow: 0 0 8px rgba(180, 74, 60, 0.28);
+    opacity: 0.9;
+    text-shadow: 0 0 8px rgba(66, 195, 200, 0.35);
   }
 </style>
