@@ -43,11 +43,14 @@
       </p>
       <div style="height: 100vh;"></div>
       <h1>test</h1>
-      <csis-translation-fade top-text="政策态势及中拉合作展望。"
-        bottom-text="The Policy Trajectory and Prospects for China-Latin America Cooperation"
-        height="240" bg-color="#0f0f10" top-color="#f2ede3"
-        bottom-color="#f2ede3" ghost-color="rgba(242, 237, 227, 0.16)"
-        label="interpreted text" label-color="#8e3b32"></csis-translation-fade>
+      <div class="component-wrap">
+        <csis-translation-scramble top-text="政策态势及中拉合作展望。"
+          bottom-text="The Policy Trajectory and Prospects for China-Latin America Cooperation"
+          height="220" bg-color="#0f0f10" text-color="#f2ede3"
+          dud-color="#b44a3c" label="signal decode" label-color="#8e3b32"
+          trigger-start="top 50%" speed="2"
+          reveal-delay="0"></csis-translation-scramble>
+      </div>
 
       <div style="height: 100vh;"></div>
 
