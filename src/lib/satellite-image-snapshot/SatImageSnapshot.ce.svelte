@@ -11,6 +11,7 @@
       btnSVGColor: { attribute: "btn-svg-color", type: "String" },
       btnHoverColor: { attribute: "btn-hover-color", type: "String" },
       btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
+      imageObjectFit: { attribute: "img-object-fit", type: "String" },
       tooltipFontSize: { attribute: "tooltip-font-size", type: "String" },
       timelineLineColor: { attribute: "timeline-line-color", type: "String" },
       timelineCircleSize: {
@@ -93,6 +94,7 @@
     btnGap = ".5rem",
     btnHoverColor = "hsl(0 0% 50% / 0.05)",
     btnBgHoverColor = "white",
+    imageObjectFit = "contain",
     tooltipFontSize = ".8rem",
     timelineLineColor = "#d9d9d9",
     timelineCircleSize = "1rem",
@@ -269,6 +271,7 @@
       --btn-svg-color: ${btnSVGColor};
       --btn-hover-color: ${btnHoverColor};
       --btn-bg-hover-color: ${btnBgHoverColor};
+      --img-object-fit: ${imageObjectFit};
       --tooltip-font-size: ${tooltipFontSize};
       --timeline-line-color: ${timelineLineColor};
       --timeline-circle-size: ${timelineCircleSize};
@@ -431,7 +434,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: var(--img-object-fit, contain);
   }
 
   .timeline-bar {
