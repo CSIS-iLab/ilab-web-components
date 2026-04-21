@@ -18,6 +18,22 @@
       },
       speed: { type: "Number", reflect: true },
       revealDelay: { attribute: "reveal-delay", type: "Number", reflect: true },
+      fontUrl: { attribute: "font-url", type: "String", reflect: true },
+      cjkFontFamily: {
+        attribute: "cjk-font-family",
+        type: "String",
+        reflect: true,
+      },
+      latinFontFamily: {
+        attribute: "latin-font-family",
+        type: "String",
+        reflect: true,
+      },
+      labelFontFamily: {
+        attribute: "label-font-family",
+        type: "String",
+        reflect: true,
+      },
     },
   }}
 />
@@ -36,12 +52,16 @@
     bgColor = "#1d1e22",
     textColor = "#a5e5d4",
     dudColor = "#42c3c8",
-    ghostColor = "#ff00ff",
+    ghostColor = "#d93da5",
     label = "signal decode",
     labelColor = "#8e3b32",
     triggerStart = "top 72%",
     speed = 1,
     revealDelay = 0,
+    fontUrl = "",
+    cjkFontFamily = '"Noto Sans SC", sans-serif',
+    latinFontFamily = '"Space Mono", ui-monospace, monospace',
+    labelFontFamily = '"Space Mono", ui-monospace, monospace',
   } = $props();
 
   let container;
@@ -49,6 +69,46 @@
   let ghostLeftEl;
   let ghostRightEl;
   let labelEl;
+
+  let fontLink;
+  let fx;
+  let st;
+  let delayCall;
+
+  function setupFont() {
+    if (!fontUrl) return;
+
+    if (fontLink) {
+      fontLink.remove();
+      fontLink = null;
+    }
+
+    fontLink = document.createElement("link");
+    fontLink.rel = "stylesheet";
+    fontLink.href = fontUrl;
+    document.head.appendChild(fontLink);
+  }
+
+  function applyCjkMode() {
+    [textEl, ghostLeftEl, ghostRightEl].forEach((el) => {
+      if (!el) return;
+      el.style.fontFamily = cjkFontFamily;
+      el.style.letterSpacing = "0.02em";
+    });
+  }
+
+  function applyLatinMode() {
+    [textEl, ghostLeftEl, ghostRightEl].forEach((el) => {
+      if (!el) return;
+      el.style.fontFamily = latinFontFamily;
+      el.style.letterSpacing = "0.08em";
+    });
+  }
+
+  function applyLabelFont() {
+    if (!labelEl) return;
+    labelEl.style.fontFamily = labelFontFamily;
+  }
 
   class TextScramble {
     constructor(el, ghostLeftEl, ghostRightEl, chars) {
@@ -63,14 +123,21 @@
       this.resolve = null;
     }
 
-    setText(newText) {
+    setText(newText, mode = "latin") {
       const oldText = this.el.textContent || "";
       const length = Math.max(oldText.length, newText.length);
+
       const promise = new Promise((resolve) => {
         this.resolve = resolve;
       });
 
       this.queue = [];
+
+      if (mode === "cjk") {
+        applyCjkMode();
+      } else {
+        applyLatinMode();
+      }
 
       for (let i = 0; i < length; i += 1) {
         const from = oldText[i] || "";
@@ -143,11 +210,10 @@
     }
   }
 
-  let fx;
-  let st;
-  let delayCall;
-
   onMount(() => {
+    setupFont();
+    applyLabelFont();
+
     fx = new TextScramble(
       textEl,
       ghostLeftEl,
@@ -158,6 +224,7 @@
     textEl.textContent = topText;
     ghostLeftEl.textContent = topText;
     ghostRightEl.textContent = topText;
+    applyCjkMode();
 
     gsap.set(labelEl, {
       opacity: 0.95,
@@ -175,10 +242,10 @@
 
         if (revealDelay > 0) {
           delayCall = gsap.delayedCall(revealDelay / 1000, () => {
-            fx.setText(bottomText);
+            fx.setText(bottomText, "latin");
           });
         } else {
-          fx.setText(bottomText);
+          fx.setText(bottomText, "latin");
         }
       },
       onLeaveBack: () => {
@@ -186,7 +253,8 @@
           delayCall.kill();
           delayCall = null;
         }
-        fx.setText(topText);
+
+        fx.setText(topText, "cjk");
       },
     });
 
@@ -196,6 +264,11 @@
       delayCall?.kill();
       st?.kill();
       fx?.destroy();
+
+      if (fontLink) {
+        fontLink.remove();
+        fontLink = null;
+      }
     };
   });
 </script>
@@ -224,6 +297,11 @@
 </div>
 
 <style>
+  :host {
+    display: block;
+    width: 100%;
+  }
+
   .wrapper {
     position: relative;
     background: var(--bg);
@@ -247,8 +325,6 @@
   }
 
   .label {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-      "Liberation Mono", "Courier New", monospace;
     font-size: 0.72rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -269,7 +345,6 @@
     width: min(680px, 100%);
     font-size: clamp(1.15rem, 2vw, 1.85rem);
     line-height: 1.35;
-    letter-spacing: 0.01em;
     grid-area: 1 / 1;
     white-space: pre-wrap;
   }
@@ -299,14 +374,10 @@
     z-index: 2;
   }
 
-  .text.is-glitching ~ .ghost,
-  .text-stage:has(.text.is-glitching) .ghost {
-    opacity: 0.8;
-  }
-
   .text :global(.dud) {
     color: var(--dud);
     opacity: 0.9;
     text-shadow: 0 0 8px rgba(66, 195, 200, 0.35);
+    font-family: inherit;
   }
 </style>

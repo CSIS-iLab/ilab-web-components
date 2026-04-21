@@ -6,6 +6,9 @@
     <title>Testing</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Vite dev server prefers the leading slash -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <script type="module" src="/src/dev-main.js"></script>
     <style>
       html,
@@ -44,12 +47,24 @@
       <div style="height: 100vh;"></div>
       <h1>test</h1>
       <div class="component-wrap">
-        <csis-translation-scramble top-text="政策态势及中拉合作展望。"
-          bottom-text="The Policy Trajectory and Prospects for China-Latin America Cooperation"
-          height="220" bg-color="#1d1e22" text-color="#a5e5d4"
-          dud-color="#42c3c8" ghost-color="#d93da5" label="signal decode"
-          label-color="#8e3b32" trigger-start="top 50%" speed="2"
-          reveal-delay="0"></csis-translation-scramble>
+<csis-translation-scramble
+  top-text="政策态势及中拉合作展望。"
+  bottom-text="The Policy Trajectory and Prospects for China-Latin America Cooperation"
+  height="220"
+  bg-color="#1d1e22"
+  text-color="#ccf0e6"
+  dud-color="#42c3c8"
+  ghost-color="#d93da5"
+  label="signal decode"
+  label-color="#8e3b32"
+  trigger-start="top 40%"
+  speed="2"
+  reveal-delay="0"
+  font-url="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Space+Mono:wght@400;700&display=swap"
+  cjk-font-family='"Noto Sans SC", sans-serif'
+  latin-font-family='"Space Mono", ui-monospace, monospace'
+  label-font-family='"Space Mono", ui-monospace, monospace'
+></csis-translation-scramble>
       </div>
 
       <div style="height: 100vh;"></div>
