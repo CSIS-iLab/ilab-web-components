@@ -7,6 +7,7 @@
       btnBgColor: { attribute: "btn-bg-color", type: "String" },
       btnBorderColor: { attribute: "btn-border-color", type: "String" },
       btnBorderThickness: { attribute: "btn-border-thickness", type: "String" },
+      btnGap: { attribute: "btn-gap", type:"String" },
       btnSVGColor: { attribute: "btn-svg-color", type: "String" },
       btnHoverColor: { attribute: "btn-hover-color", type: "String" },
       btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
@@ -89,6 +90,7 @@
     btnBorderColor = "#DD3D3D",
     btnBorderThickness = "1px",
     btnSVGColor = "#DD3D3D",
+    btnGap = ".5rem",
     btnHoverColor = "hsl(0 0% 50% / 0.05)",
     btnBgHoverColor = "white",
     tooltipFontSize = ".8rem",
@@ -263,6 +265,7 @@
       --btn-bg-color: ${btnBgColor};
       --btn-border-color: ${btnBorderColor};
       --btn-border-thickness: ${btnBorderThickness};
+      --btn-gap: ${btnGap};
       --btn-svg-color: ${btnSVGColor};
       --btn-hover-color: ${btnHoverColor};
       --btn-bg-hover-color: ${btnBgHoverColor};
@@ -598,7 +601,7 @@
   button {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--btn-gap, 0.5rem);
     color: var(--btn-color, hsl(0 0% 50% / 0.15));
     background-color: var(--btn-bg-color, hsl(0 0% 50% / 0.15));
     border: 1px solid var(--btn-border-color, #dd3d3d);
