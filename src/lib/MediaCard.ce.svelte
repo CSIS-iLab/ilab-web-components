@@ -56,6 +56,42 @@
         reflect: true,
       },
       paused: { type: "Boolean", reflect: true },
+      width: { type: "String", reflect: true },
+      borderWidth: {
+        attribute: "border-width",
+        type: "String",
+        reflect: true,
+      },
+      fontUrl: {
+        attribute: "font-url",
+        type: "String",
+        reflect: true,
+      },
+      titleFontFamily: {
+        attribute: "title-font-family",
+        type: "String",
+        reflect: true,
+      },
+      titleFontSize: {
+        attribute: "title-font-size",
+        type: "String",
+        reflect: true,
+      },
+      titleFontWeight: {
+        attribute: "title-font-weight",
+        type: "String",
+        reflect: true,
+      },
+      titleFontStyle: {
+        attribute: "title-font-style",
+        type: "String",
+        reflect: true,
+      },
+      imageOpacity: {
+        attribute: "image-opacity",
+        type: "Number",
+        reflect: true,
+      },
     },
   }}
 />
@@ -78,11 +114,31 @@
     imageShape = "circle",
     imageSize = "70%",
     paused = false,
+    width = "100%",
+    borderWidth = "1px",
+    fontUrl = "",
+    titleFontFamily = "inherit",
+    titleFontSize = "clamp(1.4rem, 2vw, 2rem)",
+    titleFontWeight = "500",
+    titleFontStyle = "normal",
+    imageOpacity = 1,
   } = $props();
 
   let rootEl;
   let videoEl;
   let prefersReducedMotion = false;
+
+  $effect(() => {
+    if (!fontUrl) return;
+
+    const existingLink = document.querySelector(`link[href="${fontUrl}"]`);
+    if (existingLink) return;
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = fontUrl;
+    document.head.appendChild(link);
+  });
 
   function normalizeOpacity(value) {
     const n = Number(value);
@@ -103,6 +159,16 @@
       String(normalizeOpacity(overlayOpacity)),
     );
     rootEl.style.setProperty("--card-image-size", imageSize);
+    rootEl.style.setProperty("--card-width", width);
+    rootEl.style.setProperty("--card-border-width", borderWidth);
+    rootEl.style.setProperty("--card-title-font-family", titleFontFamily);
+    rootEl.style.setProperty("--card-title-font-size", titleFontSize);
+    rootEl.style.setProperty("--card-title-font-weight", titleFontWeight);
+    rootEl.style.setProperty("--card-title-font-style", titleFontStyle);
+    rootEl.style.setProperty(
+      "--card-image-opacity",
+      String(normalizeOpacity(imageOpacity)),
+    );
   });
 
   function syncPlayback() {
@@ -155,7 +221,7 @@
   });
 
   function getImageShapeClass(shape) {
-    if (shape === "rounded") return "card__media--rounded";
+    if (shape === "rounded" || shape === "round") return "card__media--rounded";
     if (shape === "none") return "card__media--none";
     return "card__media--circle";
   }
@@ -209,12 +275,19 @@
     --card-overlay-color: #081a2e;
     --card-overlay-opacity: 0.45;
     --card-image-size: 70%;
+    --card-title-font-family: inherit;
+    --card-title-font-size: clamp(1.4rem, 2vw, 2rem);
+    --card-title-font-weight: 500;
+    --card-title-font-style: normal;
+    --card-image-opacity: 1;
 
+    width: min(100%, var(--card-width));
+    max-width: var(--card-width);
     position: relative;
     min-height: var(--card-height);
     height: var(--card-height);
     overflow: hidden;
-    border: 1px solid var(--card-border-color);
+    border: var(--card-border-width) solid var(--card-border-color);
     border-radius: var(--card-radius);
     background: #06111c;
     isolation: isolate;
@@ -242,8 +315,11 @@
   }
 
   .card__bg-fallback {
-    background:
-      radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08), transparent 35%),
+    background: radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 255, 255, 0.08),
+        transparent 35%
+      ),
       linear-gradient(180deg, #0b1c33 0%, #08111d 100%);
   }
 
@@ -270,20 +346,28 @@
   .card__title {
     margin: 0;
     color: var(--card-title-color);
-    font-size: clamp(1.4rem, 2vw, 2rem);
-    font-weight: 500;
+    font-family: var(--card-title-font-family);
+    font-size: var(--card-title-font-size);
+    font-weight: var(--card-title-font-weight);
+    font-style: var(--card-title-font-style);
     line-height: 1.1;
     text-align: center;
   }
 
   .card__media {
+    --available-image-height: calc(var(--card-height) - 3rem - 2.4rem - 1rem);
+
     overflow: hidden;
     background: rgba(255, 255, 255, 0.08);
-    width: var(--card-image-size);
-    max-width: 320px;
+
+    width: min(
+      var(--card-image-size),
+      calc(100% - 2rem),
+      var(--available-image-height)
+    );
+
     aspect-ratio: 1 / 1;
   }
-
   .card__media--circle {
     border-radius: 50%;
   }
@@ -301,6 +385,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    opacity: var(--card-image-opacity);
   }
 
   ::slotted(*) {
