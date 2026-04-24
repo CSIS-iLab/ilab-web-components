@@ -45,11 +45,6 @@
       },
       height: { type: "String", reflect: true },
       radius: { type: "String", reflect: true },
-      imageShape: {
-        attribute: "image-shape",
-        type: "String",
-        reflect: true,
-      },
       imageSize: {
         attribute: "image-size",
         type: "String",
@@ -92,6 +87,11 @@
         type: "Number",
         reflect: true,
       },
+      imageRadius: {
+        attribute: "image-radius",
+        type: "String",
+        reflect: true,
+      },
     },
   }}
 />
@@ -111,14 +111,14 @@
     titleColor = "#ffffff",
     height = "420px",
     radius = "24px",
-    imageShape = "circle",
+    imageRadius = "50%",
     imageSize = "70%",
     paused = false,
     width = "100%",
     borderWidth = "1px",
     fontUrl = "",
     titleFontFamily = "inherit",
-    titleFontSize = "clamp(1.4rem, 2vw, 2rem)",
+    titleFontSize = "1rem",
     titleFontWeight = "400",
     titleFontStyle = "normal",
     imageOpacity = 1,
@@ -169,6 +169,7 @@
       "--card-image-opacity",
       String(normalizeOpacity(imageOpacity)),
     );
+    rootEl.style.setProperty("--card-image-radius", imageRadius);
   });
 
   function syncPlayback() {
@@ -219,12 +220,6 @@
   $effect(() => {
     syncPlayback();
   });
-
-  function getImageShapeClass(shape) {
-    if (shape === "rounded" || shape === "round") return "card__media--rounded";
-    if (shape === "none") return "card__media--none";
-    return "card__media--circle";
-  }
 </script>
 
 <div class="card" bind:this={rootEl}>
@@ -253,7 +248,7 @@
     {/if}
 
     {#if imageSrc}
-      <div class={`card__media ${getImageShapeClass(imageShape)}`}>
+      <div class="card__media">
         <img class="card__image" src={imageSrc} alt={imageAlt} />
       </div>
     {/if}
@@ -367,17 +362,7 @@
     );
 
     aspect-ratio: 1 / 1;
-  }
-  .card__media--circle {
-    border-radius: 50%;
-  }
-
-  .card__media--rounded {
-    border-radius: 24px;
-  }
-
-  .card__media--none {
-    border-radius: 0;
+    border-radius: var(--card-image-radius);
   }
 
   .card__image {
