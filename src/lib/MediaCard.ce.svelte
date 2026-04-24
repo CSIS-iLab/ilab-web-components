@@ -100,11 +100,11 @@
   import { onMount } from "svelte";
 
   let {
-    title = "",
-    backgroundSrc = "",
+    title = "Test",
+    backgroundSrc = "https://res.cloudinary.com/csisideaslab/video/upload/v1777056407/dev-team/water-test.mp4",
     posterSrc = "",
-    imageSrc = "",
-    imageAlt = "",
+    imageSrc = "https://res.cloudinary.com/csisideaslab/image/upload/v1777056399/dev-team/seal.jpg",
+    imageAlt = "A seal sitting on rocks",
     overlayColor = "#081a2e",
     overlayOpacity = 0.45,
     borderColor = "#d6b54c",
@@ -119,7 +119,7 @@
     fontUrl = "",
     titleFontFamily = "inherit",
     titleFontSize = "clamp(1.4rem, 2vw, 2rem)",
-    titleFontWeight = "500",
+    titleFontWeight = "400",
     titleFontStyle = "normal",
     imageOpacity = 1,
   } = $props();
