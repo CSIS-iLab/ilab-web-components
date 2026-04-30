@@ -31,6 +31,7 @@
         type: "String",
       },
       timelineYearColor: { attribute: "timeline-year-color", type: "String" },
+      timelineContentBackgroundColor: { attribute: "timeline-content-background-color", type: "String" },
       timelineContentBorderThickness: { attribute: "timeline-content-border-thickness", type: "String" },
       timelineContentBorderColor: { attribute: "timeline-content-border-color", type: "String" },
       timelineContentBorderRadius: { attribute: "timeline-content-border-radius", type: "String" },
@@ -106,6 +107,7 @@
     timelineCircleBorderColor = "#d9d9d9",
     timelineCircleSelectedBorderColor = "#d9d9d9",
     timelineYearColor = "#fff",
+    timelineContentBackgroundColor = "#fff",
     timelineContentBorderThickness = "2px",
     timelineContentBorderColor = "#e6332e",
     timelineContentBorderRadius = ".5rem",
@@ -301,6 +303,7 @@
       --text-box-border-thickness: ${textBoxBorderThickness};
       --text-box-border-color: ${textBoxBorderColor};
       --text-box-border-radius: ${textBoxBorderRadius};
+      --timeline-content-background-color: ${timelineContentBackgroundColor};
       --timeline-content-border-thickness: ${timelineContentBorderThickness};
       --timeline-content-border-color: ${timelineContentBorderColor};
       --timeline-content-border-radius: ${timelineContentBorderRadius};
@@ -429,6 +432,7 @@
     border: var(--timeline-content-border-thickness, 4px) solid var(--timeline-content-border-color, #e6332e);
     border-radius: var(--timeline-content-border-radius, .5rem);
     padding: var(--timeline-content-padding, 1rem);
+    background-color: var(--timeline-content-background-color, gray);
   }
   .snapshot-timeline {
     display: grid;
