@@ -53,7 +53,7 @@
     textColor = "#a5e5d4",
     dudColor = "#42c3c8",
     ghostColor = "#d93da5",
-    label = "signal decode",
+    label = "",
     labelColor = "#8e3b32",
     triggerStart = "top 72%",
     speed = 1,
@@ -323,14 +323,10 @@
 
   .frame {
     width: min(760px, 100%);
-    border: 1px solid rgba(242, 237, 227, 0.16);
+    border: none;
     padding: 1.2rem 1.25rem 1.5rem;
     position: relative;
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.025),
-      rgba(255, 255, 255, 0)
-    );
+    background: transparent;
   }
 
   .label {
