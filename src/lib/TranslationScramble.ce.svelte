@@ -9,8 +9,6 @@
       textColor: { attribute: "text-color", type: "String", reflect: true },
       dudColor: { attribute: "dud-color", type: "String", reflect: true },
       ghostColor: { attribute: "ghost-color", type: "String", reflect: true },
-      label: { type: "String", reflect: true },
-      labelColor: { attribute: "label-color", type: "String", reflect: true },
       triggerStart: {
         attribute: "trigger-start",
         type: "String",
@@ -26,11 +24,6 @@
       },
       latinFontFamily: {
         attribute: "latin-font-family",
-        type: "String",
-        reflect: true,
-      },
-      labelFontFamily: {
-        attribute: "label-font-family",
         type: "String",
         reflect: true,
       },
@@ -53,22 +46,18 @@
     textColor = "#a5e5d4",
     dudColor = "#42c3c8",
     ghostColor = "#d93da5",
-    label = "",
-    labelColor = "#8e3b32",
     triggerStart = "top 72%",
     speed = 1,
     revealDelay = 0,
     fontUrl = "",
     cjkFontFamily = '"Noto Sans SC", sans-serif',
     latinFontFamily = '"Space Mono", ui-monospace, monospace',
-    labelFontFamily = '"Space Mono", ui-monospace, monospace',
   } = $props();
 
   let container;
   let textEl;
   let ghostLeftEl;
   let ghostRightEl;
-  let labelEl;
 
   let fontLink;
   let fx;
@@ -103,11 +92,6 @@
       el.style.fontFamily = latinFontFamily;
       el.style.letterSpacing = "0.03em";
     });
-  }
-
-  function applyLabelFont() {
-    if (!labelEl) return;
-    labelEl.style.fontFamily = labelFontFamily;
   }
 
   class TextScramble {
@@ -221,7 +205,6 @@
 
   onMount(() => {
     setupFont();
-    applyLabelFont();
 
     fx = new TextScramble(
       textEl,
@@ -234,11 +217,6 @@
     ghostLeftEl.textContent = topText;
     ghostRightEl.textContent = topText;
     applyCjkMode();
-
-    gsap.set(labelEl, {
-      opacity: 0.95,
-      y: 0,
-    });
 
     st = ScrollTrigger.create({
       trigger: container,
@@ -290,13 +268,10 @@
     --text: {textColor};
     --dud: {dudColor};
     --ghost: {ghostColor};
-    --label: {labelColor};
     height: {height}px;
   "
 >
   <div class="frame">
-    <div class="label" bind:this={labelEl}>{label}</div>
-
     <div class="text-stage">
       <div class="ghost ghost--left" bind:this={ghostLeftEl}></div>
       <div class="ghost ghost--right" bind:this={ghostRightEl}></div>
@@ -327,14 +302,6 @@
     padding: 1.2rem 1.25rem 1.5rem;
     position: relative;
     background: transparent;
-  }
-
-  .label {
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--label);
-    margin-bottom: 0.9rem;
   }
 
   .text-stage {
