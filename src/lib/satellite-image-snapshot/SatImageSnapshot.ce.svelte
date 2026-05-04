@@ -141,6 +141,7 @@
 
     try {
       data = await getData(dataURL)
+      console.log(data);
       selectedIndex = data.length ? data.length - 1 : 0
 
       await tick()
@@ -312,9 +313,10 @@
   >
     <!-- <div class="timeline-content"> -->
       <div class="snapshot-media">
-        <figure>
+        {@html selectedItem.imageLink}
+        <!-- <figure>
           <img src={selectedItem.imageLink} alt={selectedItem.imageAlt} />
-        </figure>
+        </figure> -->
       </div>
 
       <div class="timeline-bar" aria-label="Timeline navigation">
