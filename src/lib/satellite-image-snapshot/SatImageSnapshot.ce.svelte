@@ -7,7 +7,7 @@
       btnBgColor: { attribute: "btn-bg-color", type: "String" },
       btnBorderColor: { attribute: "btn-border-color", type: "String" },
       btnBorderThickness: { attribute: "btn-border-thickness", type: "String" },
-      btnGap: { attribute: "btn-gap", type:"String" },
+      btnGap: { attribute: "btn-gap", type: "String" },
       btnSVGColor: { attribute: "btn-svg-color", type: "String" },
       btnHoverColor: { attribute: "btn-hover-color", type: "String" },
       btnBgHoverColor: { attribute: "btn-bg-hover-color", type: "String" },
@@ -31,11 +31,26 @@
         type: "String",
       },
       timelineYearColor: { attribute: "timeline-year-color", type: "String" },
-      timelineContentBackgroundColor: { attribute: "timeline-content-background-color", type: "String" },
-      timelineContentBorderThickness: { attribute: "timeline-content-border-thickness", type: "String" },
-      timelineContentBorderColor: { attribute: "timeline-content-border-color", type: "String" },
-      timelineContentBorderRadius: { attribute: "timeline-content-border-radius", type: "String" },
-      timelineContentPadding: { attribute: "timeline-content-padding", type: "String" },
+      timelineContentBackgroundColor: {
+        attribute: "timeline-content-background-color",
+        type: "String",
+      },
+      timelineContentBorderThickness: {
+        attribute: "timeline-content-border-thickness",
+        type: "String",
+      },
+      timelineContentBorderColor: {
+        attribute: "timeline-content-border-color",
+        type: "String",
+      },
+      timelineContentBorderRadius: {
+        attribute: "timeline-content-border-radius",
+        type: "String",
+      },
+      timelineContentPadding: {
+        attribute: "timeline-content-padding",
+        type: "String",
+      },
       boxFontUrl: { attribute: "box-font-url", type: "String" },
       boxFontFamily: { attribute: "box-font-family", type: "String" },
       titleColor: { attribute: "title-color", type: "String" },
@@ -141,7 +156,7 @@
 
     try {
       data = await getData(dataURL)
-      console.log(data);
+      console.log(data)
       selectedIndex = data.length ? data.length - 1 : 0
 
       await tick()
@@ -159,19 +174,19 @@
   })
   /* -------------------- font loading -------------------- */
   onMount(() => {
-    if (!boxFontUrl) return;
+    if (!boxFontUrl) return
 
     const existing = document.querySelector(
-      `link[data-csis-font="${boxFontUrl}"]`
-    );
-    if (existing) return;
+      `link[data-csis-font="${boxFontUrl}"]`,
+    )
+    if (existing) return
 
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = boxFontUrl;
-    link.dataset.csisFont = boxFontUrl;
-    document.head.appendChild(link);
-  });
+    const link = document.createElement("link")
+    link.rel = "stylesheet"
+    link.href = boxFontUrl
+    link.dataset.csisFont = boxFontUrl
+    document.head.appendChild(link)
+  })
 
   const selectedItem = $derived(data[selectedIndex])
 
@@ -312,106 +327,113 @@
     `}
   >
     <!-- <div class="timeline-content"> -->
-      <div class="snapshot-media">
-        {@html selectedItem.imageLink}
-        <!-- <figure>
+    <div class="snapshot-media">
+      <!-- {@html selectedItem.imageLink} -->
+      <csis-magnifier
+        bind:this={magnifierEl}
+        background-image={selectedItem.imageLink}
+        background-image-alt={selectedItem.imageAlt}
+        magnifier-zoom="1.5"
+        magnifier-border-color="#fff"
+      ></csis-magnifier>
+      <!-- <figure>
           <img src={selectedItem.imageLink} alt={selectedItem.imageAlt} />
         </figure> -->
-      </div>
+    </div>
 
-      <div class="timeline-bar" aria-label="Timeline navigation">
-        <button
-          class="nav-btn left"
-          type="button"
-          onclick={prev}
-          disabled={selectedIndex === 0}
-          aria-label="Previous item"
+    <div class="timeline-bar" aria-label="Timeline navigation">
+      <button
+        class="nav-btn left"
+        type="button"
+        onclick={prev}
+        disabled={selectedIndex === 0}
+        aria-label="Previous item"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          ><path
+            d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"
+          /></svg
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24px"
-            viewBox="0 -960 960 960"
-            width="24px"
-            ><path
-              d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"
-            /></svg
-          >
-          Prev
-        </button>
+        Prev
+      </button>
 
-        <div class="timeline-shell" bind:this={timelineShell}>
-          <div class="timeline-tooltip" style={`left: ${tooltipLeft}px;`}>
-            {timelineItems[activeTooltipIndex]?.dateText}
-          </div>
-
-          <div
-            class="timeline-track-wrap"
-            bind:this={timelineScroller}
-            onscroll={handleScroll}
-          >
-            <div class="timeline-rail" style={`width: ${railWidth}px;`}>
-              <div
-                class="timeline-line"
-                style={`left: ${EDGE_PAD}px; width: ${Math.max(0, railWidth - EDGE_PAD * 2)}px;`}
-              ></div>
-
-              <ol class="timeline-points">
-                {#each timelineItems as item, index}
-                  <li
-                    class="timeline-point"
-                    class:selected={index === selectedIndex}
-                    style={`left: ${EDGE_PAD + item.x}px;`}
-                    data-index={index}
-                  >
-                    <button
-                      type="button"
-                      class:selected={index === selectedIndex}
-                      aria-current={index === selectedIndex ? "true" : undefined}
-                      aria-label={item.dateText}
-                      onclick={() => selectItem(index)}
-                      onmouseenter={() => handleEnter(index)}
-                      onmouseleave={handleLeave}
-                      onfocus={() => handleEnter(index)}
-                      onblur={handleLeave}
-                    >
-                      <span class="dot"></span>
-                      {#if item.isNewYear}
-                        <span class="year-tick"></span>
-                        <span class="year">{item.year}</span>
-                      {/if}
-                    </button>
-                  </li>
-                {/each}
-              </ol>
-            </div>
-          </div>
+      <div class="timeline-shell" bind:this={timelineShell}>
+        <div class="timeline-tooltip" style={`left: ${tooltipLeft}px;`}>
+          {timelineItems[activeTooltipIndex]?.dateText}
         </div>
 
-        <button
-          class="nav-btn right"
-          type="button"
-          onclick={next}
-          disabled={selectedIndex === data.length - 1}
-          aria-label="Next item"
+        <div
+          class="timeline-track-wrap"
+          bind:this={timelineScroller}
+          onscroll={handleScroll}
         >
-          Next
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            height="24px"
-            viewBox="0 -960 960 960"
-            width="24px"
-            ><path
-              d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"
-            /></svg
-          >
-        </button>
+          <div class="timeline-rail" style={`width: ${railWidth}px;`}>
+            <div
+              class="timeline-line"
+              style={`left: ${EDGE_PAD}px; width: ${Math.max(0, railWidth - EDGE_PAD * 2)}px;`}
+            ></div>
+
+            <ol class="timeline-points">
+              {#each timelineItems as item, index}
+                <li
+                  class="timeline-point"
+                  class:selected={index === selectedIndex}
+                  style={`left: ${EDGE_PAD + item.x}px;`}
+                  data-index={index}
+                >
+                  <button
+                    type="button"
+                    class:selected={index === selectedIndex}
+                    aria-current={index === selectedIndex ? "true" : undefined}
+                    aria-label={item.dateText}
+                    onclick={() => selectItem(index)}
+                    onmouseenter={() => handleEnter(index)}
+                    onmouseleave={handleLeave}
+                    onfocus={() => handleEnter(index)}
+                    onblur={handleLeave}
+                  >
+                    <span class="dot"></span>
+                    {#if item.isNewYear}
+                      <span class="year-tick"></span>
+                      <span class="year">{item.year}</span>
+                    {/if}
+                  </button>
+                </li>
+              {/each}
+            </ol>
+          </div>
+        </div>
       </div>
 
-      <div class="snapshot-content">
-        <h2>{selectedItem.title}</h2>
-        <em>{selectedItem.dateTextLongMonth}</em>
-        <p>{@html DOMPurify.sanitize(selectedItem.description)}</p>
-      </div>
+      <button
+        class="nav-btn right"
+        type="button"
+        onclick={next}
+        disabled={selectedIndex === data.length - 1}
+        aria-label="Next item"
+      >
+        Next
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          ><path
+            d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"
+          /></svg
+        >
+      </button>
+    </div>
+
+    <div class="snapshot-content">
+      <h2>{selectedItem.title}</h2>
+      <em>{selectedItem.dateTextLongMonth}</em>
+      <p>{@html DOMPurify.sanitize(selectedItem.description)}</p>
+    </div>
     <!-- </div> -->
   </section>
 {/if}
@@ -431,8 +453,9 @@
   .timeline-content {
     max-width: 900px;
     margin-inline: auto;
-    border: var(--timeline-content-border-thickness, 4px) solid var(--timeline-content-border-color, #e6332e);
-    border-radius: var(--timeline-content-border-radius, .5rem);
+    border: var(--timeline-content-border-thickness, 4px) solid
+      var(--timeline-content-border-color, #e6332e);
+    border-radius: var(--timeline-content-border-radius, 0.5rem);
     padding: var(--timeline-content-padding, 1rem);
     background-color: var(--timeline-content-background-color, gray);
   }
@@ -669,7 +692,7 @@
   }
 
   .snapshot-content {
-    font-family: var(--box-font-family, 'IBM Plex Sans', system-ui, sans-serif);
+    font-family: var(--box-font-family, "IBM Plex Sans", system-ui, sans-serif);
     max-width: 900px;
     width: 100%;
     margin-inline: auto;
