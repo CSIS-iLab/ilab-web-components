@@ -156,7 +156,6 @@
 
     try {
       data = await getData(dataURL)
-      console.log(data)
       selectedIndex = data.length ? data.length - 1 : 0
 
       await tick()
