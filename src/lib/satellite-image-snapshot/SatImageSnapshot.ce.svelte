@@ -671,6 +671,7 @@
     fill: var(--btn-svg-color, #dd3d3d);
     inline-size: 1em;
     block-size: 1em;
+
   }
   .nav-btn {
     appearance: none;
@@ -682,6 +683,10 @@
     &:is(:hover, :focus-visible) {
       background-color: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
       color: var(--btn-hover-color, #dd3d3d);
+
+      & svg {
+        fill: var(--btn-hover-color, #dd3d3d);
+      }
     }
   }
 
