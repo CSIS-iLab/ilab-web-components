@@ -51,6 +51,10 @@
         attribute: "timeline-content-padding",
         type: "String",
       },
+      timelineGap: {
+        attribute: "timeline-gap",
+        type: "String",
+      },
       boxFontUrl: { attribute: "box-font-url", type: "String" },
       boxFontFamily: { attribute: "box-font-family", type: "String" },
       titleColor: { attribute: "title-color", type: "String" },
@@ -127,6 +131,7 @@
     timelineContentBorderColor = "#e6332e",
     timelineContentBorderRadius = ".5rem",
     timelineContentPadding = "1rem",
+    timelineGap = "1.5rem",
     boxFontUrl = "",
     boxFontFamily = "'IBM Plex Sans', system-ui, sans-serif",
     titleColor = "#000",
@@ -323,6 +328,7 @@
       --timeline-content-border-color: ${timelineContentBorderColor};
       --timeline-content-border-radius: ${timelineContentBorderRadius};
       --timeline-content-padding: ${timelineContentPadding};
+      --timeline-gap: ${timelineGap};
     `}
   >
     <!-- <div class="timeline-content"> -->
@@ -335,9 +341,6 @@
         magnifier-zoom="1.5"
         magnifier-border-color="#fff"
       ></csis-magnifier>
-      <!-- <figure>
-          <img src={selectedItem.imageLink} alt={selectedItem.imageAlt} />
-        </figure> -->
     </div>
 
     <div class="timeline-bar" aria-label="Timeline navigation">
@@ -460,7 +463,7 @@
   }
   .snapshot-timeline {
     display: grid;
-    gap: 1.5rem;
+    gap: var(--timeline-gap, 1.5rem);
     /* height: 100vh; */
   }
 
@@ -706,7 +709,7 @@
     border: var(--text-box-border-thickness, 2px) solid
       var(--text-box-border-color, transparent);
     border-radius: var(--text-box-border-radius, 0.5rem);
-    padding: 1rem 1rem;
+    padding: 0;
   }
 
   .snapshot-content h2 {
