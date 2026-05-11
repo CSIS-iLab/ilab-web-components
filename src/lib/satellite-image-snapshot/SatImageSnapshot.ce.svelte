@@ -3,6 +3,12 @@
     tag: "csis-satellite-snapshot",
     props: {
       dataURL: { attribute: "data-url", type: "String" },
+      magnifier: { attribute: "magnifier", type: "String" },
+      magnifierZoom: { attribute: "magnifier-zoom", type: "Number" },
+      magnifierBorderColor: {
+        attribute: "magnifier-border-color",
+        type: "String",
+      },
       btnColor: { attribute: "btn-color", type: "String" },
       btnBgColor: { attribute: "btn-bg-color", type: "String" },
       btnBorderColor: { attribute: "btn-border-color", type: "String" },
@@ -14,10 +20,7 @@
       imageObjectFit: { attribute: "img-object-fit", type: "String" },
       tooltipFontSize: { attribute: "tooltip-font-size", type: "String" },
       timelineLineColor: { attribute: "timeline-line-color", type: "String" },
-      timelineCircleSize: {
-        attribute: "timeline-circle-size",
-        type: "String",
-      },
+      timelineCircleSize: { attribute: "timeline-circle-size", type: "String" },
       timelineCircleColor: {
         attribute: "timeline-circle-color",
         type: "String",
@@ -51,10 +54,7 @@
         attribute: "timeline-content-padding",
         type: "String",
       },
-      timelineGap: {
-        attribute: "timeline-gap",
-        type: "String",
-      },
+      timelineGap: { attribute: "timeline-gap", type: "String" },
       boxFontUrl: { attribute: "box-font-url", type: "String" },
       boxFontFamily: { attribute: "box-font-family", type: "String" },
       titleColor: { attribute: "title-color", type: "String" },
@@ -108,8 +108,17 @@
   let timelineShell = $state()
   let scrollLeft = $state(0)
 
+  // image + magnifier state
+  let imgEl = $state()
+  let glass = $state(null)
+  let imgVisible = $state(false)
+  let cleanupMagnifier = () => {}
+
   let {
     dataURL = "",
+    magnifier = "off",
+    magnifierZoom = 1.5,
+    magnifierBorderColor = "#fff",
     btnColor = "#ccc",
     btnBgColor = "#fff",
     btnBorderColor = "#DD3D3D",
@@ -149,7 +158,9 @@
     textBoxBorderRadius = "15px",
   } = $props()
 
-  let container = $state()
+  let isMobileOrTablet = $state(false)
+
+  const isMagnifierOn = $derived(magnifier === "on" && !isMobileOrTablet)
 
   const EDGE_PAD = 56
   const MIN_GAP_PX = 56
@@ -158,33 +169,25 @@
 
   onMount(async () => {
     if (!dataURL) return
-
     try {
       data = await getData(dataURL)
       selectedIndex = data.length ? data.length - 1 : 0
-
       await tick()
-
       requestAnimationFrame(() => {
         scrollToIndex(selectedIndex, "auto")
-
-        requestAnimationFrame(() => {
-          syncScrollLeft()
-        })
+        requestAnimationFrame(() => syncScrollLeft())
       })
     } catch (error) {
       console.error("Error fetching data:", error)
     }
   })
-  /* -------------------- font loading -------------------- */
+
   onMount(() => {
     if (!boxFontUrl) return
-
     const existing = document.querySelector(
       `link[data-csis-font="${boxFontUrl}"]`,
     )
     if (existing) return
-
     const link = document.createElement("link")
     link.rel = "stylesheet"
     link.href = boxFontUrl
@@ -192,27 +195,41 @@
     document.head.appendChild(link)
   })
 
+  onMount(() => {
+    const mediaQuery = window.matchMedia("(max-width: 1024px)")
+
+    function updateDeviceState() {
+      isMobileOrTablet = mediaQuery.matches
+
+      // If the screen becomes 1024px or smaller, remove the magnifier immediately
+      if (isMobileOrTablet) {
+        cleanupMagnifier()
+      }
+    }
+
+    updateDeviceState()
+
+    mediaQuery.addEventListener("change", updateDeviceState)
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateDeviceState)
+    }
+  })
+
   const selectedItem = $derived(data[selectedIndex])
 
   const timelineItems = $derived.by(() => {
     if (!data.length) return []
-
     let x = 0
-
     return data.map((item, index) => {
-      if (index === 0) {
-        return { ...item, x }
-      }
-
+      if (index === 0) return { ...item, x }
       const prev = data[index - 1]
       const gapDays = Math.max(
         1,
         Math.round((item.timestamp - prev.timestamp) / 86400000),
       )
       const gapPx = Math.max(MIN_GAP_PX, gapDays * PX_PER_DAY)
-
       x += gapPx
-
       return { ...item, x }
     })
   })
@@ -227,13 +244,10 @@
   const tooltipLeft = $derived.by(() => {
     const item = timelineItems[activeTooltipIndex]
     if (!item || !timelineShell) return TOOLTIP_EDGE_PAD
-
     const rawLeft = EDGE_PAD + item.x - scrollLeft
     const shellWidth = timelineShell.clientWidth || 0
-
     const min = TOOLTIP_EDGE_PAD
     const max = Math.max(min, shellWidth - TOOLTIP_EDGE_PAD)
-
     return Math.max(min, Math.min(rawLeft, max))
   })
 
@@ -263,30 +277,117 @@
   function scrollToIndex(index, behavior = "smooth") {
     const item = timelineItems[index]
     if (!item || !timelineScroller) return
-
     const target = EDGE_PAD + item.x - timelineScroller.clientWidth / 2
-
-    timelineScroller.scrollTo({
-      left: Math.max(0, target),
-      behavior,
-    })
-
-    requestAnimationFrame(() => {
-      syncScrollLeft()
-    })
+    timelineScroller.scrollTo({ left: Math.max(0, target), behavior })
+    requestAnimationFrame(() => syncScrollLeft())
   }
 
   function handleEnter(index) {
     hoveredIndex = index
   }
-
   function handleLeave() {
     hoveredIndex = null
   }
-
   function handleScroll() {
     syncScrollLeft()
   }
+
+  // ── Magnifier logic ──────────────────────────────────────────
+
+  function initMagnifier(img) {
+    cleanupMagnifier()
+
+    const zoom = magnifierZoom
+    const g = document.createElement("div")
+    g.className = "img-magnifier-glass"
+    g.style.setProperty("--magnifier-border-color", magnifierBorderColor)
+    img.parentElement.insertBefore(g, img)
+
+    g.style.backgroundImage = `url('${img.src}')`
+    g.style.backgroundRepeat = "no-repeat"
+    g.style.backgroundSize = `${img.width * zoom}px ${img.height * zoom}px`
+
+    const bw = 3
+    const w = g.offsetWidth / 2
+    const h = g.offsetHeight / 2
+
+    function getCursorPos(e) {
+      const rect = img.getBoundingClientRect()
+      let x = e.pageX - rect.left - window.pageXOffset
+      let y = e.pageY - rect.top - window.pageYOffset
+      return { x, y }
+    }
+
+    function move(e) {
+      e.preventDefault()
+      let { x, y } = getCursorPos(e)
+      if (x > img.width - w / zoom) x = img.width - w / zoom
+      if (x < w / zoom) x = w / zoom
+      if (y > img.height - h / zoom) y = img.height - h / zoom
+      if (y < h / zoom) y = h / zoom
+      g.style.left = x - w + "px"
+      g.style.top = y - h + "px"
+      g.style.backgroundPosition = `-${x * zoom - w + bw}px -${y * zoom - h + bw}px`
+    }
+
+    const opts = { passive: false }
+    g.addEventListener("mousemove", move)
+    img.addEventListener("mousemove", move)
+    g.addEventListener("touchmove", move, opts)
+    img.addEventListener("touchmove", move, opts)
+
+    glass = g
+
+    cleanupMagnifier = () => {
+      g.removeEventListener("mousemove", move)
+      img.removeEventListener("mousemove", move)
+      g.removeEventListener("touchmove", move)
+      img.removeEventListener("touchmove", move)
+      g.remove()
+      glass = null
+    }
+  }
+
+  // Runs whenever the image element or selected item changes
+  $effect(() => {
+    const img = imgEl
+    const item = selectedItem
+
+    if (!img || !item?.imageLink) return
+
+    // Hide while loading to prevent flash
+    imgVisible = false
+
+    // Remove old glass if present
+    cleanupMagnifier()
+
+    function onLoad() {
+      imgVisible = true
+
+      if (isMagnifierOn) {
+        initMagnifier(img)
+      } else {
+        cleanupMagnifier()
+      }
+    }
+
+    if (img.complete && img.naturalWidth > 0) {
+      onLoad()
+    } else {
+      img.addEventListener("load", onLoad, { once: true })
+      img.addEventListener(
+        "error",
+        () => {
+          imgVisible = true
+        },
+        { once: true },
+      )
+    }
+
+    return () => {
+      img.removeEventListener("load", onLoad)
+    }
+  })
 </script>
 
 {#if selectedItem}
@@ -319,7 +420,7 @@
       --description-font-color: ${descriptionFontColor};
       --description-font-size: ${descriptionFontSize};
       --description-alignment: ${descriptionAlignment};
-      --text-box-bg-color:  ${textBoxBgColor};
+      --text-box-bg-color: ${textBoxBgColor};
       --text-box-border-thickness: ${textBoxBorderThickness};
       --text-box-border-color: ${textBoxBorderColor};
       --text-box-border-radius: ${textBoxBorderRadius};
@@ -331,16 +432,15 @@
       --timeline-gap: ${timelineGap};
     `}
   >
-    <!-- <div class="timeline-content"> -->
     <div class="snapshot-media">
-      <!-- {@html selectedItem.imageLink} -->
-      <csis-magnifier
-        bind:this={magnifierEl}
-        background-image={selectedItem.imageLink}
-        background-image-alt={selectedItem.imageAlt}
-        magnifier-zoom="1.5"
-        magnifier-border-color="#fff"
-      ></csis-magnifier>
+      <div class="img-magnifier-container">
+        <img
+          bind:this={imgEl}
+          src={selectedItem.imageLink}
+          alt={selectedItem.imageAlt}
+          class:visible={imgVisible}
+        />
+      </div>
     </div>
 
     <div class="timeline-bar" aria-label="Timeline navigation">
@@ -356,10 +456,9 @@
           height="24px"
           viewBox="0 -960 960 960"
           width="24px"
-          ><path
-            d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"
-          /></svg
         >
+          <path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z" />
+        </svg>
         Prev
       </button>
 
@@ -378,7 +477,6 @@
               class="timeline-line"
               style={`left: ${EDGE_PAD}px; width: ${Math.max(0, railWidth - EDGE_PAD * 2)}px;`}
             ></div>
-
             <ol class="timeline-points">
               {#each timelineItems as item, index}
                 <li
@@ -424,10 +522,9 @@
           height="24px"
           viewBox="0 -960 960 960"
           width="24px"
-          ><path
-            d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"
-          /></svg
         >
+          <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
+        </svg>
       </button>
     </div>
 
@@ -436,7 +533,6 @@
       <em>{selectedItem.dateTextLongMonth}</em>
       <p>{@html DOMPurify.sanitize(selectedItem.description)}</p>
     </div>
-    <!-- </div> -->
   </section>
 {/if}
 
@@ -446,6 +542,7 @@
     color: #111;
     font-family: Arial, sans-serif;
   }
+
   *,
   *::before,
   *::after {
@@ -461,10 +558,10 @@
     padding: var(--timeline-content-padding, 1rem);
     background-color: var(--timeline-content-background-color, gray);
   }
+
   .snapshot-timeline {
     display: grid;
     gap: var(--timeline-gap, 1.5rem);
-    /* height: 100vh; */
   }
 
   .snapshot-media {
@@ -472,21 +569,35 @@
     max-width: 900px;
     width: 100%;
     margin-inline: auto;
-    /* height: 60vh; */
     overflow: hidden;
   }
 
-  .snapshot-media figure {
-    margin: 0;
+  .img-magnifier-container {
+    position: relative;
     width: 100%;
-    height: 100%;
   }
 
-  .snapshot-media img {
+  .img-magnifier-container img {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: var(--img-object-fit, contain);
+    max-width: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .img-magnifier-container img.visible {
+    opacity: 1;
+  }
+
+  /* glass lives inside .img-magnifier-container, created via JS */
+  :global(.img-magnifier-glass) {
+    position: absolute;
+    border: 3px solid var(--magnifier-border-color, #fff);
+    border-radius: 50%;
+    cursor: none;
+    width: 150px;
+    height: 150px;
+    z-index: 9999;
   }
 
   .timeline-bar {
@@ -517,7 +628,6 @@
     padding: 0.35rem 0.5rem;
     border-radius: 0.375rem;
     box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
-    /* z-index: 20; */
     pointer-events: none;
   }
 
@@ -592,11 +702,6 @@
     border: 3px solid var(--timeline-circle-border-color, #999);
     position: relative;
     z-index: 2;
-
-    &:is(:hover, :focus-visible) {
-      background: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
-      color: var(--btn-hover-color, #dd3d3d);
-    }
   }
 
   .year-tick {
@@ -613,7 +718,7 @@
   .year {
     position: absolute;
     color: var(--timeline-year-color, gray);
-    top: calc(100% + 1.1rem); /* pushed down below the tick */
+    top: calc(100% + 1.1rem);
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
@@ -626,13 +731,51 @@
     transform: scale(1.1);
   }
 
+  button {
+    display: flex;
+    align-items: center;
+    gap: var(--btn-gap, 0.5rem);
+    color: var(--btn-color, hsl(0 0% 50% / 0.15));
+    background-color: var(--btn-bg-color, hsl(0 0% 50% / 0.15));
+    border: 1px solid var(--btn-border-color, #dd3d3d);
+    border-radius: 0.25rem;
+    transition: background 0.5s;
+    cursor: pointer;
+  }
+
+  button svg {
+    fill: var(--btn-svg-color, #dd3d3d);
+    inline-size: 1em;
+    block-size: 1em;
+  }
+
+  .nav-btn {
+    appearance: none;
+    border: var(--btn-border-thickness) solid var(--btn-border-color, #dd3d3d);
+    background-color: var(--btn-bg-color, purple);
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font: inherit;
+
+    &:is(:hover, :focus-visible) {
+      background-color: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
+      color: var(--btn-hover-color, #dd3d3d);
+      & svg {
+        fill: var(--btn-hover-color, #dd3d3d);
+      }
+    }
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
   button.left:enabled:is(:hover, :focus-visible) > svg {
-    /* animation: arrow-effect 2s; */
     animation: slide-left 2s ease-in-out 0s infinite normal none;
   }
 
   button.right:enabled:is(:hover, :focus-visible) > svg {
-    /* animation: arrow-effect 2s; */
     animation: slide-right 2s ease-in-out 0s infinite normal none;
   }
 
@@ -653,58 +796,12 @@
       transform: translateX(10px);
     }
   }
-  button {
-    display: flex;
-    align-items: center;
-    gap: var(--btn-gap, 0.5rem);
-    color: var(--btn-color, hsl(0 0% 50% / 0.15));
-    background-color: var(--btn-bg-color, hsl(0 0% 50% / 0.15));
-    border: 1px solid var(--btn-border-color, #dd3d3d);
-    border-radius: 0.25rem;
-    transition: background 0.5s;
-    cursor: pointer;
-
-    /* &:is(:hover, :focus-visible) {
-      background: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
-      color: var(--btn-hover-color, #dd3d3d);
-    } */
-  }
-
-  button svg {
-    fill: var(--btn-svg-color, #dd3d3d);
-    inline-size: 1em;
-    block-size: 1em;
-
-  }
-  .nav-btn {
-    appearance: none;
-    border: var(--btn-border-thickness) solid var(--btn-border-color, #dd3d3d);
-    background-color: var(--btn-bg-color, purple);
-    padding: 0.5rem 0.75rem;
-    cursor: pointer;
-    font: inherit;
-    &:is(:hover, :focus-visible) {
-      background-color: var(--btn-bg-hover-color, hsl(0 0% 50% / 0.05));
-      color: var(--btn-hover-color, #dd3d3d);
-
-      & svg {
-        fill: var(--btn-hover-color, #dd3d3d);
-      }
-    }
-  }
-
-  .nav-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
 
   .snapshot-content {
     font-family: var(--box-font-family, "IBM Plex Sans", system-ui, sans-serif);
     max-width: 900px;
     width: 100%;
     margin-inline: auto;
-    /* text-align: left; */
-    /* height: 15vh; */
     background-color: var(--text-box-bg-color, #ccc);
     border: var(--text-box-border-thickness, 2px) solid
       var(--text-box-border-color, transparent);
@@ -752,35 +849,27 @@
     .snapshot-timeline {
       gap: 1rem;
     }
-
     .snapshot-media {
-      height: 50vw; /* responsive height instead of auto */
       min-height: 200px;
     }
-
     .snapshot-content {
       height: auto;
-      padding-left: 1rem;
-      padding-right: 1rem;
+      padding-inline: 1rem;
     }
 
-    /* Stack the timeline bar vertically, centering everything */
     .timeline-bar {
-      grid-template-columns: 1fr 1fr; /* two equal columns for the buttons */
-      grid-template-rows: auto auto; /* two rows: buttons, then timeline */
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
       height: auto;
       justify-items: center;
     }
 
-    /* Hide the scrollable timeline on mobile */
-    /* Timeline spans both columns, sits in row 1 */
     .timeline-shell {
-      grid-column: 1 / -1; /* span full width */
+      grid-column: 1 / -1;
       grid-row: 1;
-      width: 100%; /* fill the available space */
+      width: 100%;
     }
 
-    /* Prev button moves to row 2, left column */
     .nav-btn.left {
       grid-column: 1;
       grid-row: 2;
@@ -788,7 +877,6 @@
       padding-right: 1.5rem;
     }
 
-    /* Next button moves to row 2, right column */
     .nav-btn.right {
       grid-column: 2;
       grid-row: 2;
