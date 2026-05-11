@@ -98,6 +98,7 @@
 <script>
   import { onMount, tick } from "svelte"
   import { getData } from "./api/data"
+  import { createMagnifier } from "./magnifier"
   import DOMPurify from "dompurify"
 
   let data = $state([])
@@ -110,7 +111,6 @@
 
   // image + magnifier state
   let imgEl = $state()
-  let glass = $state(null)
   let imgVisible = $state(false)
   let cleanupMagnifier = () => {}
 
@@ -292,62 +292,6 @@
     syncScrollLeft()
   }
 
-  // ── Magnifier logic ──────────────────────────────────────────
-
-  function initMagnifier(img) {
-    cleanupMagnifier()
-
-    const zoom = magnifierZoom
-    const g = document.createElement("div")
-    g.className = "img-magnifier-glass"
-    g.style.setProperty("--magnifier-border-color", magnifierBorderColor)
-    img.parentElement.insertBefore(g, img)
-
-    g.style.backgroundImage = `url('${img.src}')`
-    g.style.backgroundRepeat = "no-repeat"
-    g.style.backgroundSize = `${img.width * zoom}px ${img.height * zoom}px`
-
-    const bw = 3
-    const w = g.offsetWidth / 2
-    const h = g.offsetHeight / 2
-
-    function getCursorPos(e) {
-      const rect = img.getBoundingClientRect()
-      let x = e.pageX - rect.left - window.pageXOffset
-      let y = e.pageY - rect.top - window.pageYOffset
-      return { x, y }
-    }
-
-    function move(e) {
-      e.preventDefault()
-      let { x, y } = getCursorPos(e)
-      if (x > img.width - w / zoom) x = img.width - w / zoom
-      if (x < w / zoom) x = w / zoom
-      if (y > img.height - h / zoom) y = img.height - h / zoom
-      if (y < h / zoom) y = h / zoom
-      g.style.left = x - w + "px"
-      g.style.top = y - h + "px"
-      g.style.backgroundPosition = `-${x * zoom - w + bw}px -${y * zoom - h + bw}px`
-    }
-
-    const opts = { passive: false }
-    g.addEventListener("mousemove", move)
-    img.addEventListener("mousemove", move)
-    g.addEventListener("touchmove", move, opts)
-    img.addEventListener("touchmove", move, opts)
-
-    glass = g
-
-    cleanupMagnifier = () => {
-      g.removeEventListener("mousemove", move)
-      img.removeEventListener("mousemove", move)
-      g.removeEventListener("touchmove", move)
-      img.removeEventListener("touchmove", move)
-      g.remove()
-      glass = null
-    }
-  }
-
   // Runs whenever the image element or selected item changes
   $effect(() => {
     const img = imgEl
@@ -365,7 +309,12 @@
       imgVisible = true
 
       if (isMagnifierOn) {
-        initMagnifier(img)
+        cleanupMagnifier()
+
+        cleanupMagnifier = createMagnifier(img, {
+          zoom: magnifierZoom,
+          borderColor: magnifierBorderColor,
+        })
       } else {
         cleanupMagnifier()
       }
